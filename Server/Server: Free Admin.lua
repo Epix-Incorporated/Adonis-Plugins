@@ -21,16 +21,16 @@ local adminLevel = 1 -- level of admin you want to give everyone; NOTE: Creator 
 --]]
 
 return function()
-  service.Players.PlayerAdded:Connect(function(p)
-    if not server.Admin.CheckAdmin(p) then
-      server.Admin.SetLevel(p, adminLevel)
-      --Admin.AddAdmin(v,1,true)
+	service.Players.PlayerAdded:Connect(function(p)
+  		if not server.Admin.CheckAdmin(p) then
+      			server.Admin.SetLevel(p, adminLevel)
+			--Admin.AddAdmin(v,1,true)
 			Remote.MakeGui(v,"Notification",{
 				Title = "Notification";
 				Message = "You are an administrator. Click to view commands.";
 				Time = 10;
 				OnClick = Core.Bytecode("client.Remote.Send('ProcessCommand','"..Settings.Prefix.."cmds')");
 			})
-    end
-  end)
+		end
+	end)
 end

@@ -19,19 +19,21 @@ local adminLevel = 1 -- level of admin you want to give everyone; NOTE: Creator 
   Owner     3   (Owners are basically SuperAdmins)
   Creator   4+  (Anything 4 or higher is considering game creator level and can do absolutely anything including edit settings in-game)
 --]]
+
 local server = nil;
 local service = nil;
 
 return function()
+	local Settings = server.Settings;
 	local Remote = server.Remote;
 	local Admin = server.Admin;
 	local Core = server.Core;
 	
 	service.Players.PlayerAdded:Connect(function(p)
   		if not Admin.CheckAdmin(p) then
-      			Admin.SetLevel(p, adminLevel)
+      		Admin.SetLevel(p, adminLevel)
 			--Admin.AddAdmin(v,1,true)
-			Remote.MakeGui(v,"Notification",{
+			Remote.MakeGui(p,"Notification",{
 				Title = "Notification";
 				Message = "You are an administrator. Click to view commands.";
 				Time = 10;

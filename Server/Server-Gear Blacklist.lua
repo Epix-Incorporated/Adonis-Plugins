@@ -1,6 +1,7 @@
 --[[
   Place in Adonis_Loader > Config > Plugins
-  ModuleScript NAME MUST BE: Server: Gear Blacklist
+  ModuleScript NAME MUST START WITH Server: or Server-
+  OLD LOADERS MUST USE "Server: " (with the space after : but without the quotes)
   
   Name: Gear Blacklist
   Author: Sceleratis (Davey_Bones)

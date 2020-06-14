@@ -20,8 +20,8 @@ local adminLevel = 1 -- level of admin you want to give everyone; NOTE: Creator 
   Creator   4+  (Anything 4 or higher is considering game creator level and can do absolutely anything including edit settings in-game)
 --]]
 
-local server = nil;
-local service = nil;
+server = nil;
+service = nil;
 
 return function()
 	local Settings = server.Settings;

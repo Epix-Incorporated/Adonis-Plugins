@@ -21,8 +21,8 @@ local function check(id)
   return id
 end
 
-local server = nil;
-local service = nil;
+server = nil;
+service = nil;
 
 return function()
 	local Settings = server.Settings;

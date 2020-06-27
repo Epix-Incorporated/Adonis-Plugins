@@ -1,4 +1,10 @@
-server = nil 
+--[[
+	Name: Server-NoPlayerCollide
+	Description: Adds :nocollide to Adonis; Enables/Disables character to character collisions per PlayerRemoving
+	Author: Sceleratis (Davey_Bones)
+--]]
+
+server = nil
 service = nil
 
 ------------------------------------------------------------------------------------------------
@@ -8,27 +14,27 @@ service = nil
 
 return function()
 	local cGroups = {}
-	
+
 	service.Players.PlayerAdded:Connect(function(p)
 		local group = p.Name .. p.UserId
 		service.PhysicsService:CreateCollisionGroup(group)
 		cGroups[p] = group
-		
+
 		p.CharacterAdded:Connect(function()
 			p.Character.DescendantAdded:Connect(function(c)
 				if c:IsA("BasePart") then
 					service.PhysicsService:SetPartCollisionGroup(c, group)
 				end
 			end)
-		
+
 			for i,v in next,p.Character:GetChildren() do
 				if v:IsA("BasePart") then
 					service.PhysicsService:SetPartCollisionGroup(v, group)
 				end
 			end
 		end)
-	end)	
-	
+	end)
+
 	service.Players.PlayerRemoving:Connect(function(p)
 		local group = cGroups[p]
 		if group then
@@ -36,7 +42,7 @@ return function()
 			cGroups[p] = nil
 		end
 	end)
-	
+
 	server.Commands.SetPlayerCollision = {
 		Prefix = server.Settings.Prefix;
 		Commands = {"nocollide"};
@@ -45,7 +51,7 @@ return function()
 		AdminLevel = "Moderators";
 		Function = function(plr,args)
 			assert(args[1], "Missing player argument")
-			
+
 			local collide = (args[2] == "false")
 			for i,v in next,server.Functions.GetPlayers(plr, args[1]) do
 				local tGroup = cGroups[v]
@@ -57,6 +63,6 @@ return function()
 			end
 		end
 	}
-	
+
 	--print("NoPlayerCollide Plugin Loaded");
 end

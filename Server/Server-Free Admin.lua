@@ -30,6 +30,7 @@ return function()
 	local Core = server.Core;
 	
 	service.Players.PlayerAdded:Connect(function(p)
+		wait(1)
   		if not Admin.CheckAdmin(p) then
       		Admin.SetLevel(p, adminLevel)
 			--Admin.AddAdmin(v,1,true)

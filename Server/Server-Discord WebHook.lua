@@ -43,7 +43,11 @@ end
 
 -- Module
 return function()
-	service.Events.CommandRan:Connect(function(plr, msg, cmd, args)
+	service.Events.CommandRan:Connect(function(plr, data)
+		local msg = data.Message;
+		local cmd = data.Command;
+		local args = data.Args;
+		
 		if FindInArray(Settings.Ignore, cmd:lower()) then
 			return
 		end

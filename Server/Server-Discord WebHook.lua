@@ -45,7 +45,7 @@ end
 return function()
 	service.Events.CommandRan:Connect(function(plr, data)
 		local msg = data.Message;
-		local cmd = data.Command;
+		local cmd = data.Matched;
 		local args = data.Args;
 		
 		if FindInArray(Settings.Ignore, cmd:lower()) then

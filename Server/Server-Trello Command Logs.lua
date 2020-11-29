@@ -12,7 +12,14 @@ return function()
 	local lists = trello.getLists(board)
 	local logList = trello.getListObj(lists,{"Logs","Admin Logs","Command Logs"})
 
-	service.Events.CommandRan:connect(function(p,msg,command,args,index,table,ran,error)
+	service.Events.CommandRan:connect(function(p,data,msg,command,args,index,table,ran,error)
+		local msg = data.Message;
+		local command = data.Matched;
+		local args = data.Args;
+		local index = data.Index;
+		local ran = data.Success;
+		local error = data.Error;
+		
 		if ran and logList then 
 			local arg = ""
 			if args then

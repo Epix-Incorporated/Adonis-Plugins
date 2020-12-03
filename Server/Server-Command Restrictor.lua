@@ -6,7 +6,7 @@ return function()
 	--// If the value is set to a string it will use that as the new AdminLevel
 	--// Any commands not in the below table will be set as Creators only
 	--// You should be able to use either the command index or one of the command's "Commands" strings
-	
+
 	local commands = { --// Command string or index
 		Shutdown = "Owners";
 		Invisible = "Owners";
@@ -79,10 +79,10 @@ return function()
 		timebanlist = "Moderators";
 		banlist = "Moderators";
 	}
-	
-	
+
+
 	local whitelist = {} --// Add ONLY the command indecies to this (if you need to target a specific index)
-	
+
 	local function getIndex(str)
 		for index,cmd in next,server.Commands do
 			for i,c in next,cmd.Commands do
@@ -92,11 +92,12 @@ return function()
 			end
 		end
 	end
-	
+
 	for i,v in next,commands do
-		local found = server.Commands[i] or getIndex(i)
+		local found = (server.Commands[i] and i) or getIndex(i)
+		
 		if found then
-			whitelist[i] = v
+			whitelist[found] = v
 		end
 	end
 

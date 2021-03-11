@@ -8,8 +8,8 @@
 server = nil
 
 return function()
-	local prefix = server.Settings.Prefix;
-	local sPrefix = server.Settings.PlayerPrefix;
+	local prefix = server.Settings.Prefix; 			--// By default this is ":" and is used for most commands
+	local sPrefix = server.Settings.PlayerPrefix; 	--// By default this is "!" and is used for Player commands
 	
 	--// Finds commands that match below (as they would be chatted in-game)
 	local RemoveList_WithPrefix = {

@@ -17,7 +17,7 @@ return function()
 		sPrefix .. "hat"; --// !hat
 	}
 	
-	--// Finds commands listed below, regardless of their prefix. Added "hat" to this table would remove both !hat and :hat (even tho they aren't the same command)
+	--// Finds commands listed below, regardless of their prefix. Adding "hat" to this table would remove both !hat and :hat (even tho they aren't the same command)
 	--// You can use this one if you don't know which prefix is used by the target command.
 	local RemoveList_NoPrefix = {
 		"fire"; --// !fire (Donors) and :fire <player> (Admins)

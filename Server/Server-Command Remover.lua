@@ -65,4 +65,6 @@ return function()
 			warn("Removed ".. tostring(index) .." from commands table");
 		end
 	end
+	
+	server.Admin.CacheCommands();
 end

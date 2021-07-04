@@ -7,17 +7,17 @@
   Description: Gives every non-admin that joins admin
 --]]
 
-local adminLevel = 1 -- level of admin you want to give everyone; NOTE: Creator (level 4+) is extremely risky and not advised as they can do everything including change settings
+local adminLevel = 100 -- level of admin you want to give everyone; NOTE: Creator (level 900+) is extremely risky and not advised as they can do everything including change settings
 
 --[[
   Admin Levels:
   
   Banned   -1
   Player    0
-  Moderator 1
-  Admin     2
-  Owner     3   (Owners are basically SuperAdmins)
-  Creator   4+  (Anything 4 or higher is considering game creator level and can do absolutely anything including edit settings in-game)
+  Moderator 100
+  Admin     200
+  Owner     300   (Owners are basically SuperAdmins)
+  Creator   900+  (Anything 4 or higher is considering game creator level and can do absolutely anything including edit settings in-game)
 --]]
 
 server = nil;

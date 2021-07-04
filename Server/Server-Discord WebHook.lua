@@ -14,24 +14,6 @@ local Settings = {
 	Ignore = {}; -- Commands you want ignored. Example: {":fly", ":speed"}
 }
 
-local function GetLevel(plr)
-	local level = _G.Adonis.GetLevel(plr)
-	
-	if level > 0 then
-		if level == 1 then
-			return "Moderator"
-		elseif level == 2 then
-			return "Admin"
-		elseif level == 3 then
-			return "Owner"
-		elseif level == 4 then
-			return "Creator"
-		elseif level == 5 then
-			return "Place Owner"
-		end
-	end
-end
-
 local function FindInArray(arr, obj)
 	for i = 1, #arr do
 		if arr[i] == obj then
@@ -52,7 +34,8 @@ return function()
 			return
 		end
 		
-		local Level = GetLevel(plr)
+		local pLevel = data.PlayerData.Level
+		local Level = server.Admin.LevelToListName(pLevel)
 		if Level or (not Level and Settings.RunForGuests) then
 			HttpService:PostAsync(Settings.Webhook, HttpService:JSONEncode({
 				embeds = {{

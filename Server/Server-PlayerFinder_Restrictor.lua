@@ -1,3 +1,11 @@
+--[[
+	Author: Sceleratis/Davey_Bones
+	Description: This plugin will restrict any PlayerFinders (all, others, me, etc) to a specific admin level only
+	
+	Place ModuleScript in Adonis_Loader > Config > Plugins and name it "Server-PlayerFinder Restrictor"
+--]]
+
+
 local RestrictToLevel = 100; --// Players must be level X or higher in the admin ranks
 local PlayerFinders = {  --// Player finders to restrict
   "all",

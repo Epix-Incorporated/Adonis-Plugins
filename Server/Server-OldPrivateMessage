@@ -1,4 +1,6 @@
 --[[
+	NOTE: CURRENTLY NOT NECESSARY; OLD PM WAS ADDED BACK; LEAVING UP IN-CASE THIS CHANGES IN THE FUTURE!
+	
 	Author: Sceleratis/Davey_Bones
 	Description: This plugin adds a new command (:oldpm) which basically restores the old private message command.
 

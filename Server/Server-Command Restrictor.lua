@@ -104,9 +104,9 @@ return function()
 	for index,com in next,server.Commands do
 		local newLevel = whitelist[index];
 		if whitelist[index] ~= nil then
-			com.AdminLevel = ((type(newLevel) == "string" or type(newLevel) == "table") and newLevel) or com.AdminLevel
+			com.AdminLevel = ((type(newLevel) == "string" or type(newLevel) == "number" or type(newLevel) == "table") and newLevel) or com.AdminLevel
 		else
-			com.AdminLevel = "Creators"
+			com.AdminLevel = 900
 		end
 	end
 end

@@ -53,7 +53,7 @@ return function()
 			assert(args[1], "Missing player argument")
 
 			local collide = (args[2] == "false")
-			for i,v in next,server.Functions.GetPlayers(plr, args[1]) do
+			for _, v in ipairs(server.Functions.GetPlayers(plr, args[1])) do
 				local tGroup = cGroups[v]
 				if tGroup then
 					for p,n in next,cGroups do

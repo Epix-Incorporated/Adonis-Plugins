@@ -28,13 +28,13 @@ return function()
 	local Remote = server.Remote;
 	local Admin = server.Admin;
 	local Core = server.Core;
-	
+
 	service.Players.PlayerAdded:Connect(function(p)
 		wait(1)
   		if not Admin.CheckAdmin(p) then
       		Admin.SetLevel(p, adminLevel)
 			--Admin.AddAdmin(v,1,true)
-			Remote.MakeGui(p,"Notification",{
+			Remote.MakeGui(p, "Notification", {
 				Title = "Notification";
 				Message = "You are an administrator. Click to view commands.";
 				Time = 10;

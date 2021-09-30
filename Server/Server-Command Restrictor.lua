@@ -84,26 +84,26 @@ return function()
 	local whitelist = {} --// Add ONLY the command indecies to this (if you need to target a specific index)
 
 	local function getIndex(str)
-		for index,cmd in next,server.Commands do
-			for i,c in next,cmd.Commands do
-				if c:lower() == str:lower() then
-					return index
+		for key, cmd in pairs(server.Commands) do
+			for _, c in pairs(cmd.Commands) do
+				if string.lower(c) == string.lower(str) then
+					return key
 				end
 			end
 		end
 	end
 
-	for i,v in next,commands do
-		local found = (server.Commands[i] and i) or getIndex(i)
+	for k, v in pairs(commands) do
+		local found = (server.Commands[k] and k) or getIndex(k)
 		
 		if found then
 			whitelist[found] = v
 		end
 	end
 
-	for index,com in next,server.Commands do
-		local newLevel = whitelist[index];
-		if whitelist[index] ~= nil then
+	for key, com in pairs(server.Commands) do
+		local newLevel = whitelist[key];
+		if whitelist[key] ~= nil then
 			com.AdminLevel = ((type(newLevel) == "string" or type(newLevel) == "number" or type(newLevel) == "table") and newLevel) or com.AdminLevel
 		else
 			com.AdminLevel = 900

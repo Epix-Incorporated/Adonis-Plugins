@@ -12,13 +12,13 @@ local GearID_Blacklist = {144950355, 4842190633, 4842207161}; -- Add the asset i
 "4842212980", "4842215723", "4842197274", "4842218829", "4842201032", "4842207161", "4842190633", "144950355"
 --]]
 local function check(id)
-  for i,v in next,GearID_Blacklist do
-    if tonumber(v) == tonumber(id) then
-      return nil
-    end
-  end
-  
-  return id
+	for _, v in ipairs(GearID_Blacklist) do
+		if tonumber(v) == tonumber(id) then
+			return nil
+		end
+	end
+
+	return id
 end
 
 server = nil;
@@ -29,7 +29,7 @@ return function()
 	local Variables = server.Variables;
 	local Remote = server.Remote;
 	local Commands = server.Commands;
-	
+
  	Commands.Gear = {
 		Prefix = Settings.Prefix;
 		Commands = {"gear";"givegear";};
@@ -39,11 +39,11 @@ return function()
 		Fun = true;
 		AdminLevel = "Moderators";
 		Function = function(plr,args)
-	        local id = check(tonumber(args[2]))
+			local id = check(tonumber(args[2]))
 			local gear = id and service.Insert(id)
 			if id and gear and (gear:IsA("Tool") or gear:IsA("HopperBin")) then 
-				service.New("StringValue",gear).Name = Variables.CodeName..gear.Name 
-				for i, v in next,service.GetPlayers(plr,args[1]) do
+				service.New("StringValue", gear).Name = Variables.CodeName..gear.Name 
+				for _, v in ipairs(service.GetPlayers(plr, args[1])) do
 					if v:FindFirstChild("Backpack") then
 						gear:Clone().Parent = v.Backpack 
 					end

@@ -6,9 +6,9 @@
 local AdminLevel = 200; --// 100 - Mod, 200 - Admin, 300 - HeadAdmin
 
 return function()
-  service.Players.PlayerAdded:Connect(function(p)
-    if game.PrivateServerOwnerId == p.UserId then
-        server.Admin.SetLevel(p, AdminLevel)
-    end
-  end)
+	service.Players.PlayerAdded:Connect(function(p)
+		if game.PrivateServerOwnerId == p.UserId then
+			server.Admin.SetLevel(p, AdminLevel)
+		end
+	end)
 end

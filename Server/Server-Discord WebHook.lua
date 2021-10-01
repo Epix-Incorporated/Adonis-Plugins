@@ -29,11 +29,11 @@ return function()
 		local msg = data.Message;
 		local cmd = data.Matched;
 		local args = data.Args;
-		
-		if FindInArray(Settings.Ignore, cmd:lower()) then
+
+		if FindInArray(Settings.Ignore, string.lower(cmd)) then
 			return
 		end
-		
+
 		local pLevel = data.PlayerData.Level
 		local Level = server.Admin.LevelToListName(pLevel)
 		if Level or (not Level and Settings.RunForGuests) then

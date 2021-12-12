@@ -2,6 +2,9 @@ service = nil -- words cant explain how much i hate doing this
 --[[
 	Adonis Webhook Command Logs
 	Author: crywink / Samuel#0440
+	Notice: Discord has blocked Roblox from sending out requests. You are required to use a proxy for your webhook to work.
+		Try this DevForum post: https://devforum.roblox.com/t/discord-webhook-proxy/1500688
+		-GalacticInspired
 --]]
 
 -- Services

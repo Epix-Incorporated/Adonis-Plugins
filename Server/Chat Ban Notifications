@@ -1,0 +1,12 @@
+return function(Vargs)
+	local service, server = Vargs.Service, Vargs.Server
+
+	local Remote = server.Remote
+
+	service.Events.PlayerBanned:Connect(function(playerBanned, reason, saved: boolean?)
+		for _, player in ipairs(service.Players:GetPlayers()) do
+			server.Remote.Send(player, "Function", "ChatMessage", service.Filter(""..playerBanned.Name.." was AAC Banned!", player, player), Color3.new(1, 0.792157, 0.168627))
+			print(""..playerBanned.name.." was banned")
+		end
+	end)
+end

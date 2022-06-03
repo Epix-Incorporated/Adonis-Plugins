@@ -1,7 +1,7 @@
 --// Log commands to Trello
 
 --[[
-	Notice: Trello has blocked Roblox from sending requests. This may mean that your trello boards (and this plugin) may not work.
+	Notice: Trello has blocked Roblox from using its services. This means that your trello boards (and this plugin) will not work.
 	Any data obtained from your trello boards (e.g. admin lists, ban lists) will no longer load in-game.
 
 	- windoesboy9

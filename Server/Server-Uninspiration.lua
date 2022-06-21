@@ -1,3 +1,6 @@
+--// Name: Server-Uninspiration.lua
+--// Description: To provide people with text that is not vaguely inspiring, nor helpful.
+
 return function(Vargs)
 	local server, service = Vargs.Server, Vargs.Service
 

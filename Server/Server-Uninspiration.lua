@@ -20,7 +20,7 @@ return function(Vargs)
 				"If you keep following your dreams, they'll file a restraining order.";
 				"Don't trust random quotes you see online just because they've got a name. - Lenin";
 				"what even am i doing";
-				"The first step on the road to faliure is trying.";
+				"The first step on the road to failure is trying.";
 				"Today is pizza day, so head on down to the cafeteria to grab yourself a hot slice.";
 				"Today's security code is: 5-33-41-18";
 				"Insert other Sci-Fi genre quote here.";

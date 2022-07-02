@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
   Place in a ModuleScript under Adonis_Loader > Config > Plugins
   ModuleScript must be named: "Server: Free Admin"    (without the quotes)
@@ -7,7 +8,7 @@
   Description: Gives admin to every non-admin player that joins
 --]]
 
-local FREE_ADMIN_LEVEL = 100 -- level of admin you want to give everyone; NOTE: Creator (level 900+) is EXTREMELY risky and not advised as they can do everything including change settings
+local FREE_ADMIN_LEVEL: number = 100 -- level of admin you want to give everyone; NOTE: Creator (level 900+) is EXTREMELY risky and not advised as they can do everything including change settings
 
 --[[
   Default Admin Levels:
@@ -22,9 +23,7 @@ local FREE_ADMIN_LEVEL = 100 -- level of admin you want to give everyone; NOTE: 
   Note: This will also work for custom ranks if you specify their level.
 --]]
 
-return function(Vargs, GetEnv)
-	setfenv(1, GetEnv(nil, {script = script}))
-
+return function(Vargs)
 	local server = Vargs.Server
 	local service = Vargs.Service
 

@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
 	Author: Sceleratis (Davey_Bones)
 	Name: Server-NoPlayerCollide
@@ -7,7 +8,7 @@
 	Place in a ModuleScript under Adonis_Loader > Config > Plugins, named "Server-PlayerCollisions"
 --]]
 
-local default_collidable_state = true --// Whether players can collide by default (on join)
+local default_collidable_state: boolean = true --// Whether players can collide by default (on join)
 
 return function(Vargs)
 	local server = Vargs.Server

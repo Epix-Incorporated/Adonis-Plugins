@@ -1,7 +1,7 @@
 --[[
 	Author: Sceleratis (Davey_Bones)
 	Name: Server-NoPlayerCollide
-	Description: Adds :collisions/:nocollide and :setdefaultcollision commands;
+	Description: Adds :collisions, :nocollide, :resetcollisions and :setdefaultcollision commands;
 				 enables/disables character-to-character collisions per player
 
 	Place in a ModuleScript under Adonis_Loader > Config > Plugins, named "Server-PlayerCollisions"
@@ -18,6 +18,7 @@ return function(Vargs)
 	local Settings = server.Settings
 	local Commands = server.Commands
 	local Functions = server.Functions
+	local Remote = server.Remote
 
 	if PhysicsService:GetMaxCollisionGroups() < #PhysicsService:GetCollisionGroups() + 2 then
 		warn("NOPLAYERCOLLIDE PLUGIN ABORTED; TOO MANY EXISTING COLLISION GROUPS ARE IN THE GAME")
@@ -35,6 +36,28 @@ return function(Vargs)
 				then COLLISION_GROUP_1_NAME
 				else COLLISION_GROUP_2_NAME
 			)
+		end
+	end
+
+	local function setPlayerCollidable(plr: Player, collidable: boolean)
+		if playerCollidableStates[plr] == collidable then
+			return
+		end
+		playerCollidableStates[plr] = collidable
+		if plr.Character then
+			for _, obj in ipairs(plr.Character:GetDescendants()) do
+				applyCharPartCGroup(obj, plr)
+			end
+		end
+		if Settings.CommandFeedback then
+			Remote.MakeGui(plr, "Notification", {
+				Title = "Collisions "..(collidable and "Enabled" or "Disabled");
+				Message = string.format(
+					"Your character will %scollide with other players' characters.",
+					collidable and "" or "no longer "
+				);
+				Time = 5;
+			})
 		end
 	end
 
@@ -61,46 +84,41 @@ return function(Vargs)
 		playerCollidableStates[plr] = nil
 	end)
 
-	Commands.SetPlayerCollision = {
+	Commands.EnablePlayerCollision = {
 		Prefix = Settings.Prefix;
 		Commands = {"collisions", "collision", "cancollide", "collide"};
-		Args = {"player (default: '"..Settings.SpecialPrefix.."all')", "true/false/reset (default: reset)"};
-		Description = "Set whether the target player's character may collide with other players' characters";
+		Args = {"player (default: '"..Settings.SpecialPrefix.."all')"};
+		Description = "Allows the target player's character to collide with other players' characters";
 		AdminLevel = "Moderators";
 		Function = function(plr: Player, args: {string})
-			local state = if args[2] and args[2]:lower() == "true" then true
-				elseif args[2] and args[2]:lower() == "false" then false
-				else nil
-
 			for _, v in ipairs(if args[1] then service.GetPlayers(plr, args[1]) else service.GetPlayers()) do
-				playerCollidableStates[v] = if state == nil then default_collidable_state else state
-				if v.Character then
-					for _, obj in ipairs(v.Character:GetDescendants()) do
-						applyCharPartCGroup(obj, v)
-					end
-				end
+				setPlayerCollidable(v, true)
 			end
 		end
 	}
 
-	Commands.InverseSetPlayerCollision = {
+	Commands.DisablePlayerCollision = {
 		Prefix = Settings.Prefix;
-		Commands = {"nocollide", "nocollision", "nocollisions"};
-		Args = {"player (default: '"..Settings.SpecialPrefix.."all')", "true/false/reset (default: reset)"};
-		Description = "Inverse of "..Settings.Prefix.."collisions";
+		Commands = {"nocollide", "nocollision", "nocollisions", "cantcollide"};
+		Args = {"player (default: '"..Settings.SpecialPrefix.."all')"};
+		Description = "Opposite of "..Settings.Prefix.."collisions; allows players' characters to pass through each other";
 		AdminLevel = "Moderators";
 		Function = function(plr: Player, args: {string})
-			local state = if args[2] and args[2]:lower() == "true" then false
-				elseif args[2] and args[2]:lower() == "false" then true
-				else nil
-
 			for _, v in ipairs(if args[1] then service.GetPlayers(plr, args[1]) else service.GetPlayers()) do
-				playerCollidableStates[v] = if state == nil then default_collidable_state else state
-				if v.Character then
-					for _, obj in ipairs(v.Character:GetDescendants()) do
-						applyCharPartCGroup(obj, v)
-					end
-				end
+				setPlayerCollidable(v, false)
+			end
+		end
+	}
+
+	Commands.ResetPlayerCollision = {
+		Prefix = Settings.Prefix;
+		Commands = {"resetcollisions", "resetcollision"};
+		Args = {"player (default: '"..Settings.SpecialPrefix.."all')"};
+		Description = "Reset the target player character's ability to collide";
+		AdminLevel = "Moderators";
+		Function = function(plr: Player, args: {string})
+			for _, v in ipairs(if args[1] then service.GetPlayers(plr, args[1]) else service.GetPlayers()) do
+				setPlayerCollidable(v, default_collidable_state)
 			end
 		end
 	}
@@ -122,11 +140,10 @@ return function(Vargs)
 		Description = "Sets whether players' characters are collidable by default (assigned on join)";
 		AdminLevel = "Moderators";
 		Function = function(plr: Player, args: {string})
-			local state = assert(
-				if args[1] and args[1]:lower() == "true" then true
-					elseif args[1] and args[1]:lower() == "false" then false
-					else nil, "Argument #1 invalid or missing (must be 'true'/'false')"
-			)
+			local state = if args[1] and args[1]:lower() == "true" then true
+				elseif args[1] and args[1]:lower() == "false" then false
+				else nil
+			assert(state ~= nil, "Argument #1 invalid or missing (must be 'true'/'false')")
 
 			if default_collidable_state == state then
 				Functions.Hint(

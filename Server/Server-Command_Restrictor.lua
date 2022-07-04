@@ -1,4 +1,4 @@
---!strict
+--!nonstrict
 --[[
 	Author: Sceleratis/Davey_Bones
 	Description: This plugin will whitelist only certain commands for use, and set the rest as Creators-only

@@ -1,4 +1,4 @@
---!strict
+--!nonstrict
 --[[
 	Author: Sceleratis/Davey_Bones
 	Description: This plugin will restrict any player selectors (all, others, me, etc.) to a specific admin level only;

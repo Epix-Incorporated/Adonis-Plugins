@@ -13,7 +13,7 @@ type Permission = string|number|{string|number}
 --// If the value is set to a Permission type (rank name or level), it will use that as the new AdminLevel
 --// Any commands not in the below table will be set as Creators (Level 900+) only
 
-local WHITELISTED_COMMAND_PERMS = {--[[
+local WHITELISTED_COMMAND_PERMS: {[string]: Permission} = {--[[
 		[CMD_NAME_OR_INDEX] = ADMIN_RANK_NAME | ADMIN_LEVEL | {ADMIN_RANK_NAME | ADMIN_LEVEL}
 	]]
 	Shutdown = "HeadAdmins",

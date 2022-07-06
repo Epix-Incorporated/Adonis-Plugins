@@ -22,7 +22,7 @@ return function(Vargs)
 	local Remote = server.Remote
 
 	if PhysicsService:GetMaxCollisionGroups() < #PhysicsService:GetCollisionGroups() + 2 then
-		warn("NOPLAYERCOLLIDE PLUGIN ABORTED; TOO MANY EXISTING COLLISION GROUPS ARE IN THE GAME")
+		warn("PLAYERCOLLISIONS PLUGIN ABORTED; TOO MANY EXISTING COLLISION GROUPS ARE IN THE GAME")
 		return
 	end
 

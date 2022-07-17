@@ -47,7 +47,6 @@ return function(Vargs)
 
 	service.Events.CommandRan:Connect(function(plr: Player, data)
 		local cmd = data.Command
-		local pDat = data.PlayerData
 
 		if
 			(IGNORE_PLAYER_COMMANDS and cmd.AdminLevel == 0) --// player command
@@ -69,7 +68,7 @@ return function(Vargs)
 						"[%s](https://www.roblox.com/users/%d/profile) [%s]",
 						service.FormatPlayer(plr),
 						plr.UserId,
-						Admin.LevelToListName(pDat.Level)
+						Admin.LevelToListName(data.PlayerData.Level)
 					)
 				},
 				{
@@ -98,7 +97,7 @@ return function(Vargs)
 				if success then
 					webhookBatch = {}
 				else
-					warn("Webhook admin log failed to post;", err)
+					warn("Webhook command log failed to post;", err)
 				end
 			end
 		end

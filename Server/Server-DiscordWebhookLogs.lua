@@ -73,11 +73,11 @@ return function(Vargs)
 				},
 				{
 					name = "Command:",
-					value = "``"..data.Message.."``"
+					value = "``"..data.Message:gsub("[%*_`~]", "\\%1").."``"
 				},
 				if data.Error then {
 					name = "Error:",
-					value = "**"..data.Error.."**"
+					value = "**"..data.Error:gsub("[%*_`~]", "\\%1").."**"
 				} else nil
 			},
 			thumbnail = if EMBED_INFO.IncludePlayerThumbnail then string.format(

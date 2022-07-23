@@ -15,7 +15,7 @@ return function(Vargs)
 	local service = Vargs.Service
 
 	service.Events.PlayerAdded:Connect(function(plr: Player)
-		if game.PrivateServerOwnerId == plr.UserId then
+		if game.PrivateServerOwnerId == plr.UserId and PRIVATE_SERVER_OWNER_ADMIN_LEVEL > server.Admin.GetLevel(plr) then
 			server.Admin.SetLevel(plr, PRIVATE_SERVER_OWNER_ADMIN_LEVEL)
 		end
 	end)

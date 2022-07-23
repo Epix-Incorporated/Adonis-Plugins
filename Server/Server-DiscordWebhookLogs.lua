@@ -89,7 +89,8 @@ return function(Vargs)
 	end)
 
 	task.defer(function()
-		while task.wait(math.random(1, 5)) do
+		while true do
+			task.wait(math.random(1, 5))
 			if #webhookBatch > 0 then
 				local success, err = pcall(HttpService.PostAsync, HttpService, WEBHOOK_URL, HttpService:JSONEncode({
 					embeds = webhookBatch

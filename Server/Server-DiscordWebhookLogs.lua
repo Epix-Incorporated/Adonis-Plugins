@@ -92,15 +92,17 @@ return function(Vargs)
 		while true do
 			task.wait(math.random(1, 5))
 			if #webhookBatch > 0 then
-				local success, err = pcall(HttpService.PostAsync, HttpService, WEBHOOK_URL, HttpService:JSONEncode({
-					embeds = webhookBatch
-				}))
+				for _, embed in webhookBatch do
+					local success, err = pcall(HttpService.PostAsync, HttpService, WEBHOOK_URL, HttpService:JSONEncode({
+						embeds = embed
+					}))
 
-				if success then
-					table.clear(webhookBatch)
-				else
-					warn("Webhook command log failed to post;", err)
+					if success == false then
+						warn("Webhook command log failed to post;", err)
+					end
 				end
+
+				table.clear(webhookBatch)
 			end
 		end
 	end)

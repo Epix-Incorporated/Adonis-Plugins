@@ -14,9 +14,14 @@ return function(Vargs)
 	local server = Vargs.Server
 	local service = Vargs.Service
 
-	service.Events.PlayerAdded:Connect(function(plr: Player)
-		if game.PrivateServerOwnerId == plr.UserId and PRIVATE_SERVER_OWNER_ADMIN_LEVEL > server.Admin.GetLevel(plr) then
-			server.Admin.SetLevel(plr, PRIVATE_SERVER_OWNER_ADMIN_LEVEL)
-		end
-	end)
+	local Admin = server.Admin
+
+	--// If VIP Server is detected trigger code.
+	if game.PrivateServerOwnerId ~= 0 then
+		service.Events.PlayerAdded:Connect(function(plr: Player)
+			if game.PrivateServerOwnerId == plr.UserId and PRIVATE_SERVER_OWNER_ADMIN_LEVEL > Admin.GetLevel(plr) then
+				Admin.SetLevel(plr, PRIVATE_SERVER_OWNER_ADMIN_LEVEL)
+			end
+		end)
+	end
 end

@@ -23,7 +23,7 @@ return function(Vargs)
 
 	for ind, cmd in pairs(Commands) do
 		for _, v in ipairs(COMMANDS_TO_REMOVE) do
-			if v:lower() == ind:lower() or table.find(cmd.Commands, v:lower()) then
+			if string.lower(v) == string.lower(ind) or table.find(cmd.Commands, string.lower(v)) then
 				Commands[ind] = nil
 				count += 1
 				break

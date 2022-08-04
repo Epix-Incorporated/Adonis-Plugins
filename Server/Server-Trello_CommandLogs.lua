@@ -15,6 +15,10 @@ return function(Vargs)
 	local Settings = server.Settings
 	local HTTP = server.HTTP
 
+	while HTTP.Init ~= nil do
+		task.wait()
+	end
+
 	local trello = HTTP.Trello.API
 	if not trello then
 		warn("ABORING; NO TRELLO SETUP? MAKE SURE YOU HAVE CORRECT SETTINGS AND THEY ARE NOT ERRORING.")

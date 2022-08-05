@@ -22,8 +22,10 @@ return function(Vargs)
 
 	service.Events.PlayerAdded:Connect(function(p)
 		task.wait(1)
+
 		if not Admin.CheckAdmin(p) then
 			Admin.SetLevel(p, FREE_ADMIN_LEVEL)
+
 			if ADMIN_NOTIFICATIONS then
 				Remote.MakeGui(p, "Notification", {
 					Title = "Notification";

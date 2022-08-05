@@ -1,5 +1,5 @@
 --!nonstrict
---[[  
+--[[
 	Name: Gear Blacklist
 	Author: Sceleratis (Davey_Bones)
 	Description: This plugins allows for the blacklisting of certain IDs from the :gear command

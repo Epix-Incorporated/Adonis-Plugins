@@ -15,9 +15,17 @@ return function(Vargs)
 	local Settings = server.Settings
 	local HTTP = server.HTTP
 
-	local trello = HTTP.Trello.API(Settings.Trello_AppKey, Settings.Trello_Token)
-	local logList = trello.getListObj(trello.getLists(Settings.Trello_Primary), LOG_LIST_NAMES)
+	while HTTP.Init ~= nil do
+		task.wait()
+	end
 
+	local trello = HTTP.Trello.API
+	if not trello then
+		warn("ABORING; NO TRELLO SETUP? MAKE SURE YOU HAVE CORRECT SETTINGS AND THEY ARE NOT ERRORING.")
+		return
+	end
+
+	local logList = trello.getListObj(trello.getLists(Settings.Trello_Primary), LOG_LIST_NAMES)
 	if not logList then
 		warn("TRELLO COMMAND LOGS PLUGIN ABORTED; LOG LIST NOT FOUND ON TRELLO BOARD")
 		return
@@ -45,7 +53,7 @@ Error: %s
 				if data.Args and #data.Args > 0 then table.concat(data.Args, ", ") else "-",
 				tostring(service.GetTime()),
 				tostring(data.Success),
-				tostring(data.Error)
+				tostring(data.Error or "No error found.")
 			))
 	end)
 end

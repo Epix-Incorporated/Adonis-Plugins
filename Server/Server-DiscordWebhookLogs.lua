@@ -96,7 +96,7 @@ return function(Vargs)
 					embeds = webhookBatch
 				}))
 				if success then
-					webhookBatch = {}
+					table.clear(webhookBatch)
 				else
 					warn("Webhook command log failed to post;", err)
 				end

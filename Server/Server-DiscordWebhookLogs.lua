@@ -95,10 +95,10 @@ return function(Vargs)
 				local success, err = pcall(HttpService.PostAsync, HttpService, WEBHOOK_URL, HttpService:JSONEncode({
 					embeds = webhookBatch
 				}))
-				if success == false then
-					warn("Webhook command log failed to post;", err)
-				else
+				if success then
 					table.clear(webhookBatch)
+				else
+					warn("Webhook command log failed to post;", err)
 				end
 			end
 		end

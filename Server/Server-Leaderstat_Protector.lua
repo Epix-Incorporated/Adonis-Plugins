@@ -10,7 +10,7 @@ type Permission = string|number|{string|number}
 
 --// List of leaderstat names to protect:
 local PROTECTED_LEADERSTAT_NAMES: {string} = {
-	"Exclusive Money", "Time"
+	"Precious Money", "Time"
 }
 
 --// People with this admin level or rank can bypass leaderstat protection:
@@ -23,7 +23,7 @@ return function(Vargs)
 	local Admin = server.Admin
 	local Commands = server.Commands
 
-	for _, ind in ipairs({"Change", "AddToStat", "SubtractFromStat"}) do
+	for _, ind in {"Change", "AddToStat", "SubtractFromStat"} do
 		local cmd = Commands[ind]
 		if cmd and cmd.Function then
 			local oldFunc = cmd.Function
@@ -31,7 +31,7 @@ return function(Vargs)
 				if not (OVERRIDE_PERMISSION and Admin.CheckComLevel(data.PlayerData.Level, OVERRIDE_PERMISSION)) then
 					local statName = args[2]
 					if statName then
-						for _, protectedName in ipairs(PROTECTED_LEADERSTAT_NAMES) do
+						for _, protectedName in PROTECTED_LEADERSTAT_NAMES do
 							assert(
 								not string.match(protectedName:lower(), "^"..statName:lower()),
 								"You do not have permission to change the leaderstat \""..protectedName..'"'

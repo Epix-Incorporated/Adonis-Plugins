@@ -14,12 +14,12 @@ return function(Vargs)
 	local server = Vargs.Server
 	local service = Vargs.Service
 
-	local PhysicsService: PhysicsService = service.PhysicsService
-
 	local Settings = server.Settings
 	local Commands = server.Commands
 	local Functions = server.Functions
 	local Remote = server.Remote
+
+	local PhysicsService: PhysicsService = service.PhysicsService
 
 	if PhysicsService:GetMaxCollisionGroups() < #PhysicsService:GetCollisionGroups() + 2 then
 		warn("PLAYERCOLLISIONS PLUGIN ABORTED; TOO MANY EXISTING COLLISION GROUPS ARE IN THE GAME")
@@ -46,7 +46,7 @@ return function(Vargs)
 		end
 		playerCollidableStates[plr] = collidable
 		if plr.Character then
-			for _, obj in ipairs(plr.Character:GetDescendants()) do
+			for _, obj in plr.Character:GetDescendants() do
 				applyCharPartCGroup(obj, plr)
 			end
 		end
@@ -54,8 +54,8 @@ return function(Vargs)
 			Remote.MakeGui(plr, "Notification", {
 				Title = "Collisions "..(collidable and "Enabled" or "Disabled");
 				Message = string.format(
-					"Your character will %scollide with other players' characters.",
-					collidable and "" or "no longer "
+					"Your character will %s collide with other players' characters.",
+					collidable and "now be able to" or "no longer"
 				);
 				Time = 5;
 			})
@@ -76,7 +76,7 @@ return function(Vargs)
 		char.DescendantAdded:Connect(function(obj)
 			applyCharPartCGroup(obj, plr)
 		end)
-		for _, obj in ipairs(char:GetDescendants()) do
+		for _, obj in char:GetDescendants() do
 			applyCharPartCGroup(obj, plr)
 		end
 	end)
@@ -92,7 +92,7 @@ return function(Vargs)
 		Description = "Allows the target player's character to collide with other players' characters";
 		AdminLevel = "Moderators";
 		Function = function(plr: Player, args: {string})
-			for _, v in ipairs(if args[1] then service.GetPlayers(plr, args[1]) else service.GetPlayers()) do
+			for _, v in if args[1] then service.GetPlayers(plr, args[1]) else service.GetPlayers() do
 				setPlayerCollidable(v, true)
 			end
 		end
@@ -105,7 +105,7 @@ return function(Vargs)
 		Description = "Opposite of "..Settings.Prefix.."collisions; allows players' characters to pass through each other";
 		AdminLevel = "Moderators";
 		Function = function(plr: Player, args: {string})
-			for _, v in ipairs(if args[1] then service.GetPlayers(plr, args[1]) else service.GetPlayers()) do
+			for _, v in if args[1] then service.GetPlayers(plr, args[1]) else service.GetPlayers() do
 				setPlayerCollidable(v, false)
 			end
 		end
@@ -118,7 +118,7 @@ return function(Vargs)
 		Description = "Reset the target player character's ability to collide";
 		AdminLevel = "Moderators";
 		Function = function(plr: Player, args: {string})
-			for _, v in ipairs(if args[1] then service.GetPlayers(plr, args[1]) else service.GetPlayers()) do
+			for _, v in if args[1] then service.GetPlayers(plr, args[1]) else service.GetPlayers() do
 				setPlayerCollidable(v, default_collidable_state)
 			end
 		end

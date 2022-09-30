@@ -21,8 +21,8 @@ return function(Vargs)
 
 	local count = 0
 
-	for ind, cmd in pairs(Commands) do
-		for _, v in ipairs(COMMANDS_TO_REMOVE) do
+	for ind, cmd in Commands do
+		for _, v in COMMANDS_TO_REMOVE do
 			if string.lower(v) == string.lower(ind) or table.find(cmd.Commands, string.lower(v)) then
 				Commands[ind] = nil
 				count += 1

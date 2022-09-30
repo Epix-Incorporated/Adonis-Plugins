@@ -21,7 +21,6 @@ local EMBED_INFO = {
 	Title = "Command Ran",
 
 	IncludePlaceName = true,
-	IncludePlayerThumbnail = true,
 	IncludeTimestamp = true
 }
 
@@ -80,10 +79,6 @@ return function(Vargs)
 					value = "*"..data.Error:gsub("[%*_`~]", "\\%1").."*"
 				} else nil
 			},
-			thumbnail = if EMBED_INFO.IncludePlayerThumbnail then string.format(
-				"https://www.roblox.com/bust-thumbnail/image?userId=%d&width=420&height=420&format=png",
-				plr.UserId
-			) else nil,
 			timestamp = if EMBED_INFO.IncludeTimestamp then DateTime.now():ToIsoDate() else nil
 		})
 	end)

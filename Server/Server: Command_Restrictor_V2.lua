@@ -198,8 +198,8 @@ local Whitelisted_Commands: {[string | number]: {string}} = {
 		"unsmoke",
 	};
 
-	--| Developers+ Commands:
-	Developers = {
+	--| HeadAdmins+ Commands:
+	HeadAdmins = {
 		"fly",
 		"fix",
 		"give",

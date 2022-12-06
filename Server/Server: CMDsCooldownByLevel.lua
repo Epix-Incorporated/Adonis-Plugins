@@ -5,7 +5,7 @@
 ]]
 ---------------------------------------------------------------------------------------------|
 
-local CooldownsByRank = {
+local CooldownsByLevel = {
 	--| Format: [AdminLevel] = {Player = <Seconds>, Server = <Seconds>, CrossServer = <Seconds>}
 	
 	[0] = {

@@ -1,8 +1,9 @@
 --!strict
 --[[
 	Author: ccuser44
-	Description: This plugin will add a killlogs command which keeps track of epople who have died and for which reasons
-	Place in a ModuleScript under Adonis_Loader > Config > Plugins and named "Server-KillLogs"
+	Description: This plugin will add a killlogs command which keeps track of people who have died and for which reasons
+	This is an extended version of the original plugin and adds more details about the reason of death
+	Place in a ModuleScript under Adonis_Loader > Config > Plugins and named "Server-KillLogsExtended"
 --]]
 
 return function(Vargs)

@@ -33,12 +33,14 @@ return function(Vargs)
 	local event = service.ServerScriptService:WaitForChild("ToAdonis")
 
 	local oldTabToType = server.Logs.TabToType
-	server.Logs.GiveLogs, server.Logs.TabToType = {}, function(tab: any, ...: any): string
+	server.Logs.GiveLogs, server.Logs.TabToType, server.Logs.ListUpdaters.GiveLogs = {}, function(tab: any, ...: any): string
 		if tab == server.Logs.GiveLogs then
 			return "GiveLogs"
 		else
 			return oldTabToType(tab, ...)
 		end
+	end, function()
+		return server.Logs.GiveLogs
 	end
 	
 	server.Commands.GiveLogs = {
@@ -47,9 +49,7 @@ return function(Vargs)
 		Args = {"autoupdate? (default: false)"};
 		Description = "View the logs of players who have died";
 		AdminLevel = "Moderators";
-		ListUpdater = function()
-			return server.Logs.GiveLogs
-		end;
+		ListUpdater = "GiveLogs";
 		Function = function(plr: Player, args: {string})
 			server.Remote.MakeGui(plr, "List", {
 				Title = "Give Logs";

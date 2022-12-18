@@ -11,12 +11,14 @@ return function(Vargs)
 	local server, service = Vargs.Server, Vargs.Service
 
 	local oldTabToType = server.Logs.TabToType
-	server.Logs.KillLogs, server.Logs.TabToType = {}, function(tab: any, ...: any): string
+	server.Logs.KillLogs, server.Logs.TabToType, server.Logs.ListUpdaters.KillLogs = {}, function(tab: any, ...: any): string
 		if tab == server.Logs.KillLogs then
 			return "KillLogs"
 		else
 			return oldTabToType(tab, ...)
 		end
+	end, function()
+		return server.Logs.KillLogs
 	end
 
 	server.Commands.KillLogs = {

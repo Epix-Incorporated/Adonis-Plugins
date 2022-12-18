@@ -54,6 +54,8 @@ return function(Vargs)
 		end
 	}
 
+	server.Admin.CacheCommands()
+
 	event.Event:connect(function(plr, customer, tool)
 		server.Logs.AddLog(logs,{
 			Text = plr.Name.." gave "..customer.Name.." "..tool.Name;

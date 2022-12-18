@@ -1,0 +1,523 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<Meta name="ExplicitAutoJoints">true</Meta>
+	<External>null</External>
+	<External>nil</External>
+	<Item class="Folder" referent="RBXCBF0FEA9F5AF46B88253B80ABA2717D0">
+		<Properties>
+			<BinaryString name="AttributesSerialize"></BinaryString>
+			<string name="Name">[Adonis] GiveGui &amp; Logs</string>
+			<int64 name="SourceAssetId">-1</int64>
+			<BinaryString name="Tags"></BinaryString>
+		</Properties>
+		<Item class="ModuleScript" referent="RBX0187735C4426480CBA6CB70A981B7776">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<Content name="LinkedSource"><null></null></Content>
+				<string name="Name">Server-Give Logs</string>
+				<string name="ScriptGuid">{AC8F092B-19E7-4BDA-9B6D-F3C55A29C512}</string>
+				<ProtectedString name="Source"><![CDATA[--!nonstrict
+--[[
+	Author: Unknown
+	Description: This plugin allows moderators to view logs of the GiveGui of who gave an item to who
+	Place this ModuleScript in Adonis_Loader > Config > Plugins and name it "Server-Give Logs"
+--]]
+
+--// Sceleratis was here
+--// Give logs plugin 
+--// This is supposed to serve as an example so you can see how to hook things like give logs up to Adonis
+
+return function(Vargs)
+	local server = Vargs.Server
+	local service = Vargs.Service
+
+	local logs = {}
+	local event = service.ServerScriptService:WaitForChild("ToAdonis")
+	
+	server.Variables.ListUpdaters.GiveLogs = function()
+		return logs
+	end
+	
+	server.Commands.GiveLogs = {
+		Prefix = server.Settings.Prefix;
+		Commands = {"givelogs";};
+		Args = {};
+		Hidden = false;
+		Description = "Shows you who gave who what";
+		Fun = false;
+		AdminLevel = "Moderators";
+		Function = function(plr,args)
+			server.Remote.MakeGui(plr,"List",{
+				Title = "Give Logs";
+				Table = logs;
+				Update = "GiveLogs";
+			})
+		end
+	}
+	
+	event.Event:connect(function(plr, customer, tool)
+		server.Logs.AddLog(logs,{
+			Text = plr.Name.." gave "..customer.Name.." "..tool.Name;
+			Desc = plr.Name.." gave "..customer.Name.." "..tool.Name;
+		})
+	end)
+end]]></ProtectedString>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+		</Item>
+		<Item class="ScreenGui" referent="RBXFEB3DD16965D464D95DC01BDB75BD0C1">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<bool name="AutoLocalize">true</bool>
+				<bool name="ClipToDeviceSafeArea">true</bool>
+				<int name="DisplayOrder">0</int>
+				<bool name="Enabled">true</bool>
+				<string name="Name">GiveGui</string>
+				<bool name="ResetOnSpawn">true</bool>
+				<Ref name="RootLocalizationTable">null</Ref>
+				<token name="SafeAreaCompatibility">1</token>
+				<token name="ScreenInsets">2</token>
+				<token name="SelectionBehaviorDown">0</token>
+				<token name="SelectionBehaviorLeft">0</token>
+				<token name="SelectionBehaviorRight">0</token>
+				<token name="SelectionBehaviorUp">0</token>
+				<bool name="SelectionGroup">false</bool>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<token name="ZIndexBehavior">0</token>
+			</Properties>
+			<Item class="Frame" referent="RBXA7715E46116E4BF5ACC5AA2D00F32EEE">
+				<Properties>
+					<bool name="Active">false</bool>
+					<Vector2 name="AnchorPoint">
+						<X>0</X>
+						<Y>0</Y>
+					</Vector2>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<bool name="AutoLocalize">true</bool>
+					<token name="AutomaticSize">0</token>
+					<Color3 name="BackgroundColor3">
+						<R>0.24313727</R>
+						<G>0.24313727</G>
+						<B>0.24313727</B>
+					</Color3>
+					<float name="BackgroundTransparency">0.5</float>
+					<Color3 name="BorderColor3">
+						<R>0.105882362</R>
+						<G>0.164705887</G>
+						<B>0.207843155</B>
+					</Color3>
+					<token name="BorderMode">0</token>
+					<int name="BorderSizePixel">0</int>
+					<bool name="ClipsDescendants">true</bool>
+					<bool name="Draggable">true</bool>
+					<int name="LayoutOrder">0</int>
+					<string name="Name">Frame</string>
+					<Ref name="NextSelectionDown">null</Ref>
+					<Ref name="NextSelectionLeft">null</Ref>
+					<Ref name="NextSelectionRight">null</Ref>
+					<Ref name="NextSelectionUp">null</Ref>
+					<UDim2 name="Position">
+						<XS>0</XS>
+						<XO>0</XO>
+						<YS>0</YS>
+						<YO>200</YO>
+					</UDim2>
+					<Ref name="RootLocalizationTable">null</Ref>
+					<float name="Rotation">0</float>
+					<bool name="Selectable">false</bool>
+					<token name="SelectionBehaviorDown">0</token>
+					<token name="SelectionBehaviorLeft">0</token>
+					<token name="SelectionBehaviorRight">0</token>
+					<token name="SelectionBehaviorUp">0</token>
+					<bool name="SelectionGroup">false</bool>
+					<Ref name="SelectionImageObject">null</Ref>
+					<int name="SelectionOrder">0</int>
+					<UDim2 name="Size">
+						<XS>0</XS>
+						<XO>50</XO>
+						<YS>0</YS>
+						<YO>30</YO>
+					</UDim2>
+					<token name="SizeConstraint">0</token>
+					<int64 name="SourceAssetId">-1</int64>
+					<token name="Style">0</token>
+					<BinaryString name="Tags"></BinaryString>
+					<bool name="Visible">true</bool>
+					<int name="ZIndex">1</int>
+				</Properties>
+				<Item class="TextBox" referent="RBXA54A1467B65D4F5D98CFB2513F6F4DAF">
+					<Properties>
+						<bool name="Active">true</bool>
+						<Vector2 name="AnchorPoint">
+							<X>0</X>
+							<Y>0</Y>
+						</Vector2>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<bool name="AutoLocalize">true</bool>
+						<token name="AutomaticSize">0</token>
+						<Color3 name="BackgroundColor3">
+							<R>0</R>
+							<G>0</G>
+							<B>0</B>
+						</Color3>
+						<float name="BackgroundTransparency">0.5</float>
+						<Color3 name="BorderColor3">
+							<R>0.105882362</R>
+							<G>0.164705887</G>
+							<B>0.207843155</B>
+						</Color3>
+						<token name="BorderMode">0</token>
+						<int name="BorderSizePixel">0</int>
+						<bool name="ClearTextOnFocus">true</bool>
+						<bool name="ClipsDescendants">false</bool>
+						<bool name="Draggable">false</bool>
+						<token name="Font">3</token>
+						<Font name="FontFace">
+							<Family><url>rbxasset://fonts/families/SourceSansPro.json</url></Family>
+							<Weight>400</Weight>
+							<Style>Normal</Style>
+							<CachedFaceId><url>rbxasset://fonts/SourceSansPro-Regular.ttf</url></CachedFaceId>
+						</Font>
+						<int name="LayoutOrder">0</int>
+						<float name="LineHeight">1</float>
+						<int name="MaxVisibleGraphemes">-1</int>
+						<bool name="MultiLine">false</bool>
+						<string name="Name">uName</string>
+						<Ref name="NextSelectionDown">null</Ref>
+						<Ref name="NextSelectionLeft">null</Ref>
+						<Ref name="NextSelectionRight">null</Ref>
+						<Ref name="NextSelectionUp">null</Ref>
+						<Color3 name="PlaceholderColor3">
+							<R>0.699999988</R>
+							<G>0.699999988</G>
+							<B>0.699999988</B>
+						</Color3>
+						<string name="PlaceholderText"></string>
+						<UDim2 name="Position">
+							<XS>0</XS>
+							<XO>50</XO>
+							<YS>0</YS>
+							<YO>3</YO>
+						</UDim2>
+						<bool name="RichText">false</bool>
+						<Ref name="RootLocalizationTable">null</Ref>
+						<float name="Rotation">0</float>
+						<bool name="Selectable">true</bool>
+						<token name="SelectionBehaviorDown">0</token>
+						<token name="SelectionBehaviorLeft">0</token>
+						<token name="SelectionBehaviorRight">0</token>
+						<token name="SelectionBehaviorUp">0</token>
+						<bool name="SelectionGroup">false</bool>
+						<Ref name="SelectionImageObject">null</Ref>
+						<int name="SelectionOrder">0</int>
+						<bool name="ShowNativeInput">true</bool>
+						<UDim2 name="Size">
+							<XS>0</XS>
+							<XO>150</XO>
+							<YS>1</YS>
+							<YO>-6</YO>
+						</UDim2>
+						<token name="SizeConstraint">0</token>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<string name="Text"></string>
+						<Color3 name="TextColor3">
+							<R>1</R>
+							<G>0.94901967</G>
+							<B>0.952941239</B>
+						</Color3>
+						<bool name="TextEditable">true</bool>
+						<bool name="TextScaled">false</bool>
+						<float name="TextSize">18</float>
+						<Color3 name="TextStrokeColor3">
+							<R>0</R>
+							<G>0</G>
+							<B>0</B>
+						</Color3>
+						<float name="TextStrokeTransparency">1</float>
+						<float name="TextTransparency">0</float>
+						<token name="TextTruncate">0</token>
+						<bool name="TextWrapped">false</bool>
+						<token name="TextXAlignment">0</token>
+						<token name="TextYAlignment">1</token>
+						<bool name="Visible">true</bool>
+						<int name="ZIndex">1</int>
+					</Properties>
+				</Item>
+				<Item class="TextButton" referent="RBXCDEABFE51BF742608F6564E72D2F4D74">
+					<Properties>
+						<bool name="Active">true</bool>
+						<Vector2 name="AnchorPoint">
+							<X>0</X>
+							<Y>0</Y>
+						</Vector2>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<bool name="AutoButtonColor">true</bool>
+						<bool name="AutoLocalize">true</bool>
+						<token name="AutomaticSize">0</token>
+						<Color3 name="BackgroundColor3">
+							<R>0</R>
+							<G>0</G>
+							<B>0</B>
+						</Color3>
+						<float name="BackgroundTransparency">0.5</float>
+						<Color3 name="BorderColor3">
+							<R>0.105882362</R>
+							<G>0.164705887</G>
+							<B>0.207843155</B>
+						</Color3>
+						<token name="BorderMode">0</token>
+						<int name="BorderSizePixel">0</int>
+						<bool name="ClipsDescendants">false</bool>
+						<bool name="Draggable">false</bool>
+						<token name="Font">3</token>
+						<Font name="FontFace">
+							<Family><url>rbxasset://fonts/families/SourceSansPro.json</url></Family>
+							<Weight>400</Weight>
+							<Style>Normal</Style>
+							<CachedFaceId><url>rbxasset://fonts/SourceSansPro-Regular.ttf</url></CachedFaceId>
+						</Font>
+						<int name="LayoutOrder">0</int>
+						<float name="LineHeight">1</float>
+						<int name="MaxVisibleGraphemes">-1</int>
+						<bool name="Modal">false</bool>
+						<string name="Name">Open</string>
+						<Ref name="NextSelectionDown">null</Ref>
+						<Ref name="NextSelectionLeft">null</Ref>
+						<Ref name="NextSelectionRight">null</Ref>
+						<Ref name="NextSelectionUp">null</Ref>
+						<UDim2 name="Position">
+							<XS>0</XS>
+							<XO>0</XO>
+							<YS>0</YS>
+							<YO>3</YO>
+						</UDim2>
+						<bool name="RichText">false</bool>
+						<Ref name="RootLocalizationTable">null</Ref>
+						<float name="Rotation">0</float>
+						<bool name="Selectable">true</bool>
+						<bool name="Selected">false</bool>
+						<token name="SelectionBehaviorDown">0</token>
+						<token name="SelectionBehaviorLeft">0</token>
+						<token name="SelectionBehaviorRight">0</token>
+						<token name="SelectionBehaviorUp">0</token>
+						<bool name="SelectionGroup">false</bool>
+						<Ref name="SelectionImageObject">null</Ref>
+						<int name="SelectionOrder">0</int>
+						<UDim2 name="Size">
+							<XS>0</XS>
+							<XO>50</XO>
+							<YS>1</YS>
+							<YO>-6</YO>
+						</UDim2>
+						<token name="SizeConstraint">0</token>
+						<int64 name="SourceAssetId">-1</int64>
+						<token name="Style">0</token>
+						<BinaryString name="Tags"></BinaryString>
+						<string name="Text">Hand to</string>
+						<Color3 name="TextColor3">
+							<R>1</R>
+							<G>0.94901967</G>
+							<B>0.952941239</B>
+						</Color3>
+						<bool name="TextScaled">false</bool>
+						<float name="TextSize">14</float>
+						<Color3 name="TextStrokeColor3">
+							<R>0</R>
+							<G>0</G>
+							<B>0</B>
+						</Color3>
+						<float name="TextStrokeTransparency">1</float>
+						<float name="TextTransparency">0</float>
+						<token name="TextTruncate">0</token>
+						<bool name="TextWrapped">false</bool>
+						<token name="TextXAlignment">2</token>
+						<token name="TextYAlignment">1</token>
+						<bool name="Visible">true</bool>
+						<int name="ZIndex">1</int>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="LocalScript" referent="RBX52FDAD725697463DA8340A945509A9D4">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<bool name="Disabled">false</bool>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">EditMe</string>
+					<token name="RunContext">0</token>
+					<string name="ScriptGuid">{733E1606-10FD-407D-B60A-116829C8090E}</string>
+					<ProtectedString name="Source"><![CDATA[--// Sceleratis was here
+
+
+--// Settings
+local group = 886423 	--// Group ID
+local ranks = {			--// List of ranks allowed to use the give gui
+	255
+}
+
+--// No need to touch anything below
+local gui = script.Parent
+local frame = script.Parent.Frame
+local name = frame.uName
+local toggle = frame.Open
+
+local Players = game:GetService("Players")
+local localplayer = Players.LocalPlayer
+local rEvent = game:GetService("ReplicatedStorage"):WaitForChild("GiveEvent")
+local UserInputService = game:GetService("UserInputService")
+
+local open = false 
+local debounce = false
+local allowed = false
+
+local function doOpen()
+	frame:TweenSize(UDim2.new(0, 200, 0, 30), nil, nil, nil, true)
+end
+
+local function doClose()
+	frame:TweenSize(UDim2.new(0, 50, 0, 30), nil, nil, nil, true)
+end
+
+local function process()
+	if name.Text ~= "" then
+		local player
+		for _, v in pairs(Players:GetChildren()) do
+			if string.sub(string.lower(v.Name), 1, #name.Text) == string.lower(name.Text) then
+				player = v
+				break
+			end
+		end
+
+		if player then
+			local tool
+			for _, v in pairs(localplayer.Character:GetChildren()) do
+				if v:IsA("Tool") then
+					print("Sending")
+					tool = v
+					rEvent:FireServer(player,v)
+					name.Text = "Sent"
+					task.wait(0.5)
+					break
+				end
+			end
+
+			if not tool then
+				name.Text = "No Tool"
+				task.wait(0.5)
+			end
+		else
+			name.Text = "Not Found"
+			task.wait(0.5)
+		end
+		name.Text = ""
+	end
+end
+
+if localplayer:IsInGroup(group) then
+	for _, v in pairs(ranks) do
+		if localplayer:GetRankInGroup(group) == v then
+			allowed = true
+			break
+		end
+	end
+end
+
+if allowed then
+	name.FocusLost:connect(function(enterPressed)
+		if enterPressed and not debounce then
+			debounce = true
+			process()
+			debounce = false
+		end
+	end)
+	
+	toggle.MouseButton1Down:connect(function()
+		if open then
+			doClose()
+			open = false
+		else
+			doOpen()
+			open = true
+		end
+	end)
+	
+	UserInputService.InputBegan:connect(function(InputObject)
+		local textbox = UserInputService:GetFocusedTextBox()
+		if not textbox and InputObject.UserInputType == Enum.UserInputType.Keyboard and InputObject.KeyCode == Enum.KeyCode.Semicolon then
+			if not open then
+				doOpen()
+				open = true
+			end
+			name:CaptureFocus()
+		end
+	end)
+else
+	gui:Destroy()
+end]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="Script" referent="RBX95DC695965784545A35C9794FD1AE835">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<bool name="Disabled">false</bool>
+				<Content name="LinkedSource"><null></null></Content>
+				<string name="Name">GiveGui_ServerSide</string>
+				<token name="RunContext">0</token>
+				<string name="ScriptGuid">{A1D94DE5-0461-43A9-B6E3-3630B3C6E044}</string>
+				<ProtectedString name="Source"><![CDATA[--// Sceleratis was here
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+local Players = game:GetService("Players")
+
+local event = Instance.new("RemoteEvent", ReplicatedStorage)
+local toAdonis = Instance.new("BindableEvent", ServerScriptService)
+
+event.Name = "GiveEvent"
+toAdonis.Name = "ToAdonis"
+
+event.Archivable = false
+toAdonis.Archivable = false
+
+event.OnServerEvent:connect(function(p, target, tool)
+	if p and p.Parent == Players and target and target.Parent == Players and tool and tool.Parent == p.Character then
+		local backpack = target:FindFirstChild("Backpack")
+		if backpack then
+			tool.Parent = backpack
+			toAdonis:Fire(p, target, tool)
+		end
+	end
+end)]]></ProtectedString>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+		</Item>
+		<Item class="ModuleScript" referent="RBXDAF5175A633B4F94B9E02CD937DA376E">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<Content name="LinkedSource"><null></null></Content>
+				<string name="Name">READ ME</string>
+				<string name="ScriptGuid">{C7A946AC-7775-411C-A662-65797E1164F2}</string>
+				<ProtectedString name="Source"><![CDATA[--[[
+	Instructions:
+	
+	1. Place GiveGui_ServerSide into game.ServerScriptService
+	2. (Optional) Place "Server-Give Logs" into Adonis_Loader/Config/Plugins
+	3. Edit GiveGui/EditMe; You will need to enter your group ID and ranks that can use the GUI
+	4. Place GiveGui into game.StarterGui
+	
+	Thats pretty much all there is to it;
+	This is made to be an example of how to connect scripts to Adonis;
+	
+	Sceleratis was here;
+--]]]]></ProtectedString>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+		</Item>
+	</Item>
+</roblox>

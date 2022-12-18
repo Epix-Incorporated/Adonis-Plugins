@@ -33,7 +33,7 @@ return function(Vargs)
 	local logs = {}
 	local event = service.ServerScriptService:WaitForChild("ToAdonis")
 
-	server.Variables.ListUpdaters.GiveLogs = function()
+	server.Logs.ListUpdaters.GiveLogs = function()
 		return logs
 	end
 

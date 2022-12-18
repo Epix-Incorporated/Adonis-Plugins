@@ -1,6 +1,7 @@
 --!strict
 --[[
 	Author: ccuser44
+	Name: KillLogs module
 	Description: This plugin will add a killlogs command which keeps track of people who have died and for which reasons
 	Place in a ModuleScript under Adonis_Loader > Config > Plugins and named "Server-KillLogs"
 --]]

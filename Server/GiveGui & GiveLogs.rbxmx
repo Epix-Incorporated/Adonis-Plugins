@@ -32,28 +32,28 @@ return function(Vargs)
 
 	local logs = {}
 	local event = service.ServerScriptService:WaitForChild("ToAdonis")
-	
+
 	server.Variables.ListUpdaters.GiveLogs = function()
 		return logs
 	end
-	
+
 	server.Commands.GiveLogs = {
 		Prefix = server.Settings.Prefix;
-		Commands = {"givelogs";};
-		Args = {};
-		Hidden = false;
-		Description = "Shows you who gave who what";
-		Fun = false;
+		Commands = {"givelogs"};
+		Args = {"autoupdate? (default: false)"};
+		Description = "View the logs of players who have died";
 		AdminLevel = "Moderators";
-		Function = function(plr,args)
-			server.Remote.MakeGui(plr,"List",{
+		ListUpdater = "GiveLogs";
+		Function = function(plr: Player, args: {string})
+			server.Remote.MakeGui(plr, "List", {
 				Title = "Give Logs";
-				Table = logs;
+				Table =  server.Logs.ListUpdaters.GiveLogs(plr);
 				Update = "GiveLogs";
+				AutoUpdate = if args[1] and (string.lower(args[1]) == "true" or string.lower(args[1]) == "yes") then 1 else nil;
 			})
 		end
 	}
-	
+
 	event.Event:connect(function(plr, customer, tool)
 		server.Logs.AddLog(logs,{
 			Text = plr.Name.." gave "..customer.Name.." "..tool.Name;

@@ -41,7 +41,7 @@ return function(Vargs)
 		else
 			return oldTabToType(tab, ...)
 		end
-	end, function()
+	end, function(_)
 		return server.Logs.KillLogs
 	end
 
@@ -56,11 +56,9 @@ return function(Vargs)
 			server.Remote.MakeGui(plr, "List", {
 				Title = "Kill Logs";
 				Table =  server.Logs.ListUpdaters.KillLogs(plr);
-				Dots = true;
 				Update = "KillLogs";
 				AutoUpdate = if args[1] and (string.lower(args[1]) == "true" or string.lower(args[1]) == "yes") then 1 else nil;
 				Sanitize = true;
-				Stacking = true;
 			})
 		end
 	}
@@ -68,7 +66,8 @@ return function(Vargs)
 	server.Admin.CacheCommands()
 
 	service.HookEvent("CharacterAdded", function(player: Player)
-		local humanoid = player:FindFirstChildOfClass("Humanoid") or player.Character:WaitForChild("Humanoid") :: Humanoid
+		local character = player.Character :: Model
+		local humanoid = character:FindFirstChildOfClass("Humanoid") or character:WaitForChild("Humanoid") :: Humanoid
 
 		humanoid.Died:Connect(function()
 			local killer = humanoid:FindFirstChild("creator") :: ObjectValue

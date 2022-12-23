@@ -136,7 +136,7 @@ return function(Vargs)
 
 	server.CommandsVerificationLock = {
 		Prefix = server.Settings.Prefix;
-		Commands = {"slock", "verificationlock", "enableantialt"};
+		Commands = {"altlock", "verificationlock", "enableantialt"};
 		Args = {"on/off"};
 		Description = "Enables/disables server lock";
 		AdminLevel = "Admins";
@@ -145,13 +145,13 @@ return function(Vargs)
 
 			if (not arg and Variables.AltVerificationLock ~= true) or arg == "on" or arg == "true" then
 				Variables.AltVerificationLock = true
-				Functions.Hint("Server anti-alt verification lock is enabled", {plr})
+				Functions.Hint("Server anti-alt verification lock is enabled", service.Players:GetPlayers())
 				clearDictionary(vcEnabledCache)
 				--clearDictionary(emailVerifiedCache)
 				--clearDictionary(isInGroupCache)
 			elseif Variables.AltVerificationLock == true or arg == "off" or arg == "false" then
 				Variables.AltVerificationLock = false
-				Functions.Hint("Server anti-alt verification lock is disabled", {plr})
+				Functions.Hint("Server anti-alt verification lock is disabled", service.Players:GetPlayers())
 				clearDictionary(vcEnabledCache)
 				--clearDictionary(emailVerifiedCache)
 				--clearDictionary(isInGroupCache)

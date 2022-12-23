@@ -2,7 +2,7 @@
 --[[
 	Author: ccuser44
 	Name: VerificationLock module
-	Description: This plugin will add a killlogs command which keeps track of people who have died and for which reasons
+	Description: This plugin will adds a :VerificationLock command which allows you to enable/disable an anti-alt feature
 	Place in a ModuleScript under Adonis_Loader > Config > Plugins and named "Server-VerificationLock"
 	License: MIT
 --]]

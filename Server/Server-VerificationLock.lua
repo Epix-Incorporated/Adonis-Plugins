@@ -1,4 +1,4 @@
---!strict
+--!nonstrict
 --[[
 	Author: ccuser44
 	Name: VerificationLock module
@@ -39,6 +39,7 @@ local lastCacheClear = os.clock()
 
 return function(Vargs)
 	local server, service = Vargs.Server, Vargs.Service
+	local Variables, Functions = server.Variables, server.Functions
 	local checkAdmin = server.Admin.CheckAdmin
 
 	local function isVoicechatEnabled(player)
@@ -69,7 +70,7 @@ return function(Vargs)
 			local isVerified = false
 
 			for _, assetId in ipairs(VERIFIED_ASSETS) do
-				if Service.CheckAssetOwnership(player, assetId) == true then
+				if service.CheckAssetOwnership(player, assetId) == true then
 					isVerified = true
 					break
 				end
@@ -99,7 +100,7 @@ return function(Vargs)
 	
 			if success and type(value) == "boolean" then
 				if value == true then
-					emailVerifiedCache[player.UserId] = isVerified
+					isInGroupCache[player.UserId] = value
 				end
 
 				return value
@@ -133,8 +134,8 @@ return function(Vargs)
 		end
 	end
 
-	VerificationLock = {
-		Prefix = Settings.Prefix;
+	server.CommandsVerificationLock = {
+		Prefix = server.Settings.Prefix;
 		Commands = {"slock", "verificationlock", "enableantialt"};
 		Args = {"on/off"};
 		Description = "Enables/disables server lock";

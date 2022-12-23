@@ -134,7 +134,7 @@ return function(Vargs)
 		end
 	end
 
-	server.CommandsVerificationLock = {
+	server.Commands.VerificationLock = {
 		Prefix = server.Settings.Prefix;
 		Commands = {"altlock", "verificationlock", "enableantialt"};
 		Args = {"on/off"};

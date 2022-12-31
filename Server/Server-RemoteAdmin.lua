@@ -3,7 +3,7 @@
 	Author: EasternBloxxer
 	Description: This plugin enables the setting of certain players' admin ranks via a BindableEvent
 
-	Place in a ModuleScript under Adonis_Loader > Config > Plugins and named "Server-Command_Remover"
+	Place in a ModuleScript under Adonis_Loader > Config > Plugins and named "Server-RemoteAdmin"
 
 	Usage:
 		AdminRemote:Fire(player: Player, key: string, adminLevel: string | number, isTemporary: boolean?)

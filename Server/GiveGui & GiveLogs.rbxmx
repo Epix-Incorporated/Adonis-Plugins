@@ -47,7 +47,7 @@ return function(Vargs)
 		Prefix = server.Settings.Prefix;
 		Commands = {"givelogs"};
 		Args = {"autoupdate? (default: false)"};
-		Description = "View the logs of players who have died";
+		Description = "View the logs of tools given via the givegui";
 		AdminLevel = "Moderators";
 		ListUpdater = "GiveLogs";
 		Function = function(plr: Player, args: {string})

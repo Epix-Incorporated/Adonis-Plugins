@@ -21,6 +21,7 @@ return function(Vargs)
 	local Variables = server.Variables
 	local Commands = server.Commands
 	local Remote = server.Remote
+	local Admin = server.Admin
 
 	local oldFunc = Commands.Gear and Commands.Gear.Function
 	if not oldFunc then
@@ -36,4 +37,6 @@ return function(Vargs)
 		end
 		return oldFunc(plr, args, ...)
 	end
+
+	Admin.CacheCommands()
 end

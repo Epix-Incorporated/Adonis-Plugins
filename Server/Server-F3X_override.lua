@@ -2,7 +2,7 @@
 --[[
 	Author: ccuser44
 	Name: F3X override
-	Description: This plugin allows you to override the default F3X deps
+	Description: This plugin allows you to override the default F3X deps. You need to have a custom "F3X Deps" under this instance
 	Place in a ModuleScript under Adonis_Loader > Config > Plugins and named "Server-F3X_override"
 	License: CC0
 --]]

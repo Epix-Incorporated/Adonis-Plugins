@@ -1,10 +1,10 @@
---!nonstrict
+--!strict
 --[[
 	Author: ccuser44
-	Name: VerificationLock module
-	Description: This plugin will adds a :VerificationLock command which allows you to enable/disable an anti-alt feature
-	Place in a ModuleScript under Adonis_Loader > Config > Plugins and named "Server-VerificationLock"
-	License: MIT
+	Name: F3X override
+	Description: This plugin allows you to override the default F3X deps
+	Place in a ModuleScript under Adonis_Loader > Config > Plugins and named "Server-F3X_override"
+	License: CC0
 --]]
 --[[
 	CC0 License

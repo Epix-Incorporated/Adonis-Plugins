@@ -18,4 +18,5 @@ return function(Vargs)
 	end
 	server.Logs.SaveCommandLogs = function() end
 	--------------------------------------------------------------------
+	server.Admin.CacheCommands()
 end

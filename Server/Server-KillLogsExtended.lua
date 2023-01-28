@@ -76,7 +76,7 @@ return function(Vargs)
 				local killerName = (killer.Value:IsA("Humanoid") and killer.Value.Parent) and killer.Value.Parent.Name or killer.Value.Name :: string
 				local humanoidRoot, killerRoot = humanoid.RootPart, (killer.Value:IsA("Humanoid") and killer.Value.RootPart or (killer.Value:IsA("Player") and killer.Value.Character) and killer.Value.Character.PrimaryPart)
 
-				local message = killerName .. " killed " .. player.Name..((killerRoot and humanoidRoot) and string.format(" %.2f studs away", (humanoidRoot.Position - killerRoot.Position).Magnitude) or "")..((killer.Value:IsA("Player") and killer.Value.Character and killer.Value.Character:FindFirstChildOfClass("Tool")) and " with a "..killer.Value.Character:FindFirstChildOfClass("Tool").Name or "")
+				local message = killerName .. " killed " .. player.Name..((killerRoot and humanoidRoot) and string.format(" %.2f studs away", (humanoidRoot.Position - killerRoot.Position).Magnitude) or "")..((killerRoot.Parent and killerRoot.Parent:FindFirstChildOfClass("Tool")) and " with a "..killerRoot.Parent:FindFirstChildOfClass("Tool").Name or "")
 
 				server.Logs.AddLog(server.Logs.KillLogs, {
 					Text = message,

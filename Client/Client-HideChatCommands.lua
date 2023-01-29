@@ -39,7 +39,7 @@ return function(Vargs)
 		end
 	end
 
-	rawset(client.Variables, "HideChatCommands", true)
+	rawset(client.Variables, "HideChatCommands", nil)
 
 	if type(getmetatable(client.Variables)) == "table" then
 		local mt = getmetatable(client.Variables)

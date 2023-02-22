@@ -12,7 +12,7 @@
 ------------------------------------------------------------------------------------------------------------------------------]]
 
 local Server_Type = nil
-local Ranks_To_Ignore_Commands: {string | number} = {"Players"}
+local Ranks_To_Ignore_Commands: {string | number} = {"Players", 0}
 local Logging_List_Names: {string} = {"Logs", "Admin Logs", "Command Logs", "Game Logs"}
 local Commands_To_Ignore: {string} = {
 	"!test"

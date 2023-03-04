@@ -14,7 +14,7 @@ return function(Vargs)
 	-- The code below this will COMPLETELY remove the OldCommandLogs functionality and it will stop saving old logs entirely. 
 	-- Delete from here to the line if you just want the command disabled.
 	server.Logs.ListUpdaters.OldCommandLogs = function()
-		return {};
+		return {}
 	end
 	server.Logs.SaveCommandLogs = function() end
 	--------------------------------------------------------------------

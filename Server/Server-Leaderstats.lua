@@ -40,7 +40,7 @@ return function(Vargs)
 		end
 	}
 	
-	Commands.	RemoveLeaderstats = {
+	Commands.RemoveLeaderstats = {
 		Prefix = Settings.Prefix;
 		Commands = {"removestat", "rstat", "rs"};
 		Args = {"name"};

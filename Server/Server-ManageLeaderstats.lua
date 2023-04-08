@@ -1,9 +1,9 @@
 --!nonstrict
 --[[
 	Author: BaconOfWalker (Jumbo891011)
-	Name: Server-Leaderstats
+	Name: Server-ManageLeaderstats
 	Description: Adds :createstat. :removestat, and :removestats; Lets you create/remove leaderstats.
-	Place in a ModuleScript under Adonis_Loader > Config > Plugins, named "Server-Leaderstats"
+	Place in a ModuleScript under Adonis_Loader > Config > Plugins, named "Server-ManageLeaderstats"
 --]]
 
 return function(Vargs)

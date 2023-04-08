@@ -2,7 +2,7 @@
 --[[
 	Author: BaconOfWalker (Jumbo891011)
 	Name: Server-Leaderstats
-	Description: Adds :createstat and :removestat; Lets you create/remove leaderstats.
+	Description: Adds :createstat. :removestat, and :removestats; Lets you create/remove leaderstats.
 	Place in a ModuleScript under Adonis_Loader > Config > Plugins, named "Server-Leaderstats"
 --]]
 
@@ -17,7 +17,7 @@ return function(Vargs)
 
 	Commands.CreateLeaderstats = {
 		Prefix = Settings.Prefix;
-		Commands = {"createstat", "cstat"};
+		Commands = {"createstat", "cstat", "cs"};
 		Args = {"name"};
 		Description = "Creates a new leaderstat";
 		AdminLevel = "Moderators";
@@ -49,7 +49,7 @@ return function(Vargs)
 
 	Commands.RemoveLeaderstats = {
 		Prefix = Settings.Prefix;
-		Commands = {"removestat", "rstat"};
+		Commands = {"removestat", "rstat", "rs"};
 		Args = {"name"};
 		Description = "Removes a leaderstat";
 		AdminLevel = "Moderators";
@@ -74,6 +74,24 @@ return function(Vargs)
 				else
 					Functions.Hint(service.FormatPlayer(v).." doesn't have a leaderstats folder", {plr})
 				end
+			end
+		end
+	}
+
+	Commands.RemoveAllStats = {
+		Prefix = Settings.Prefix;
+		Commands = {"removestats", "rstats"};
+		Description = "Removes all the stats";
+		AdminLevel = "Moderators";
+		Function = function(plr)
+			local thestats = plr.leaderstats:GetChildren()
+			
+			if thestats then
+				plr.leaderstats:ClearAllChildren()
+				wait(1)
+				Functions.Hint("All leaderstats have been cleared!", {plr})
+			else
+				Functions.Hint("There are no leaderstats to remove!", {plr})
 			end
 		end
 	}

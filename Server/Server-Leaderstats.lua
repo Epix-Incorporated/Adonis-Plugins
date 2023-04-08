@@ -3,7 +3,6 @@
 	Author: BaconOfWalker (Jumbo891011)
 	Name: Server-Leaderstats
 	Description: Adds :createstat and :removestat; Lets you create/remove leaderstats.
-	DISCLAIMER: This is still WIP because this will only work if there are no existing leaderstats.
 	Place in a ModuleScript under Adonis_Loader > Config > Plugins, named "Server-Leaderstats"
 --]]
 
@@ -27,9 +26,9 @@ return function(Vargs)
 			local statName = assert(args[1], "Missing stat name")
 
 			for _, v in service.GetPlayers(plr, args[1]) do
-				local leaderstats = game.Players:FindFirstChild("leaderstats")
+				local leaderstats = plr:FindFirstChild("leaderstats")
 
-				if leaderstats then
+				if leaderstats and (leaderstats:IsA("Folder") or leaderstats:IsA("StringValue")) then
 					local statName = Instance.new("IntValue")
 					statName.Name = args[1]
 					statName.Value = 0
@@ -55,20 +54,20 @@ return function(Vargs)
 		Description = "Removes a leaderstat";
 		AdminLevel = "Moderators";
 		Function = function(plr: Player, args: {string})
-
 			local statName = assert(args[1], "Missing the stat name!")
 
 			for _, v in service.GetPlayers(plr, args[1]) do
-				local leaderstats = plr:FindFirstChild("leaderstats")
+				local children = plr:GetChildren()
+				local leaderstats = plr.leaderstats -- This checks if there is a leaderstats folder/string value [Don't change it unless you know what you are doing]
 
-				if leaderstats and (leaderstats:IsA("Folder") or leaderstats:IsA("IntValue")) then
+				if table.find(children, leaderstats) and (leaderstats:IsA("Folder") or leaderstats:IsA("StringValue")) then
 					local absoluteMatch = leaderstats:FindFirstChild(statName)
-					if absoluteMatch and (absoluteMatch:IsA("IntValue") or absoluteMatch:IsA("NumberValue") or absoluteMatch:IsA("Folder")) then
-						leaderstats:Destroy()
+					if absoluteMatch and (absoluteMatch:IsA("IntValue") or absoluteMatch:IsA("NumberValue")) then
+						absoluteMatch:Destroy()
 					else
 						for _, st in leaderstats:GetChildren() do
-							if (st:IsA("IntValue") or st:IsA("NumberValue") or st:IsA("Folder")) and string.match(st.Name:lower(), "^"..statName:lower()) then
-								leaderstats:Destroy()
+							if (st:IsA("IntValue") or st:IsA("NumberValue")) then
+								st:Destroy()
 							end
 						end
 					end

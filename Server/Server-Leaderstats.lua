@@ -88,7 +88,7 @@ return function(Vargs)
 			
 			if thestats then
 				plr.leaderstats:ClearAllChildren()
-				wait(1)
+				task.wait(1)
 				Functions.Hint("All leaderstats have been cleared!", {plr})
 			else
 				Functions.Hint("There are no leaderstats to remove!", {plr})

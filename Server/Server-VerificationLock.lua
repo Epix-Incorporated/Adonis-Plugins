@@ -115,6 +115,8 @@ return function(Vargs)
 			return true
 		elseif player.AccountAge >= MIN_ACCOUNT_AGE then
 			return true
+		elseif player:IsVerified() then
+			return true
 		elseif isVoicechatEnabled(player) then
 			return true
 		elseif isEmailVerified(player) then
@@ -125,6 +127,8 @@ return function(Vargs)
 			isInGroup((GROUP_ID ~= 0 and GROUP_ID or game.CreatorId), player)
 		then
 			return true
+		else
+			return false
 		end
 	end
 

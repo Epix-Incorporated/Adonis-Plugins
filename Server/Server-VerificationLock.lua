@@ -138,6 +138,7 @@ return function(Vargs)
 		end
 	end
 
+	Variables.AltVerificationLock = false
 	server.Commands.VerificationLock = {
 		Prefix = server.Settings.Prefix;
 		Commands = {"altlock", "verificationlock", "enableantialt"};
@@ -164,7 +165,6 @@ return function(Vargs)
 	};
 
 	server.Admin.CacheCommands()
-
 	service.HookEvent("PlayerAdded", function(player)
 		if Variables.AltVerificationLock == true then
 			if not isVerified(player) and not checkAdmin(player) then

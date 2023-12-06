@@ -43,4 +43,6 @@ return function(Vargs)
 			end
 		end
 	end
+
+	Admin.CacheCommands()
 end

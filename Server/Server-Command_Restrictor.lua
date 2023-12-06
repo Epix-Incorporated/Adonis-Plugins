@@ -6,7 +6,7 @@
 	Place this ModuleScript in Adonis_Loader > Config > Plugins and name it "Server-Command_Restrictor"
 --]]
 
-type Permission = string|number|{string|number}
+type Permission = string | number | {string | number}
 
 --// Command indexes to not restrict go into the whitelist table below
 --// If the value is false, it will use the command's original (default) AdminLevel
@@ -93,15 +93,16 @@ return function(Vargs)
 	local service = Vargs.Service
 
 	for ind, cmd in pairs(server.Commands) do
-		local whitelistPerm = WHITELISTED_COMMAND_PERMS[ind:lower()]
+		local whitelistPerm = WHITELISTED_COMMAND_PERMS[string.lower(ind)]
 		if whitelistPerm == nil then
 			for _, v in ipairs(cmd.Commands) do
-				whitelistPerm = WHITELISTED_COMMAND_PERMS[v:lower()]
+				whitelistPerm = WHITELISTED_COMMAND_PERMS[string.lower(v)]
 				if whitelistPerm ~= nil then
 					break
 				end
 			end
 		end
+
 		if whitelistPerm ~= nil then
 			if whitelistPerm then
 				cmd.AdminLevel = whitelistPerm
@@ -110,4 +111,6 @@ return function(Vargs)
 			cmd.AdminLevel = 900
 		end
 	end
+
+	server.Admin.CacheCommands()
 end

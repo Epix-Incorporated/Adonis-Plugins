@@ -18,6 +18,7 @@ return function(Vargs)
 	local Commands = server.Commands
 	local Functions = server.Functions
 	local Remote = server.Remote
+	local Admin = server.Admin
 
 	local PhysicsService: PhysicsService = service.PhysicsService
 
@@ -160,4 +161,6 @@ return function(Vargs)
 			end
 		end
 	}
+
+	Admin.CacheCommands()
 end

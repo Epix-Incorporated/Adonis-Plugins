@@ -13,6 +13,7 @@ return function(Vargs)
 	local Settings = server.Settings
 	local Commands = server.Commands
 	local Functions = server.Functions
+	local Admin = server.Admin
 
 	local BAD_QUOTES: {string} = {
 		"It's never too late to go back to bed.",
@@ -44,4 +45,6 @@ return function(Vargs)
 			Functions.Message("Random Quote", BAD_QUOTES[math.random(1, #BAD_QUOTES)], {plr})
 		end
 	}
+
+	Admin.CacheCommands()
 end

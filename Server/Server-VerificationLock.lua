@@ -29,7 +29,7 @@
 -- Only one of these checks is required
 -- EmailVerification, Premium subscription, VoiceChat, LargeAccountAge, IsAnAdmin
 local VERIFIED_ASSETS = {102611803, 93078560, 1567446, 18824203}
-local UNVERIFIED_KICK_MESSAGE = "Your acc"
+local UNVERIFIED_KICK_MESSAGE = "Your account is not verified via email, id, age, group or subscription.\nPlease verify your account by email, it is suggested not to use your main email for this."
 local MIN_ACCOUNT_AGE = 7*4*12*5
 local CACHE_CLEAR_TIME = 60
 local BE_IN_GROUP_VERIFIED = false

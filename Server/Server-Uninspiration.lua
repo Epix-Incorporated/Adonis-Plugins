@@ -26,7 +26,12 @@ return function(Vargs)
 		"Today's security code is: 5-33-41-18",
 		"Insert other Sci-Fi genre quote here.",
 		"Tiredness leads to lack of alertness, and lack of alertness leads to Adonis becoming bad.",
-		"woooooooooosh"
+		"Ben. Yes";
+		"Every day is another day.";
+		"Activating security procedures.";
+		"Bastening the turkey.";
+		"It's illegal to eat toes on Saturn";
+		"woooooooooosh";
 	}
 
 	Commands.Uninspired = {

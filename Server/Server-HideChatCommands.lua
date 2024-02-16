@@ -53,6 +53,9 @@ return function(Vargs)
 	end
 
 	service.HookEvent("CharacterAdded", function(player: Player)
-		Remote.Send(player, "SetVariables", { HideChatCommands = true })
+		--// Doesn't save unless sent to server by player
+		if player.Client.HideChatCommands == nil then
+			Remote.Send(player, "SetVariables", { HideChatCommands = true })
+		end
 	end)
 end

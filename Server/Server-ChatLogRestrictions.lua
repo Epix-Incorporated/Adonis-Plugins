@@ -3,8 +3,8 @@
 	Author: Agent BUB (agentbub.dev)
 	Name: Chatlog Restrictions
 	Description: This plugin allows for certain teams to be hidden from chatlogs. Also, if enabled, it adds the ":rchatlogs" command for the adminlevel of your choice to view chatlogs with restricted teams included.
-	Version: 1.0.0
-	Last Updated: 2022-04-27
+	Version: 1.5.0
+	Last Updated: 02/20/2024
 	License: MIT
 	Place in a ModuleScript under Adonis_Loader > Config > Plugins and named "Server-ChatLogRestrictions"
 --]]
@@ -34,13 +34,23 @@
 
 local teamNames = { -- Make sure the names match exactly.
 	"Interview",
-	"Interrogation"
+	"Interrogation",
+	"Experiment"
 }
 local rChatlogsEnabled = true -- Enables (true) or disables (false) the restricted chatlogs command
-local rChatlogsAdminLvl = "HeadAdmins" -- Normal Adonis adminLevel number value or name for rchatlogs command to work for by default
+local rChatlogsAdminLvl = "ModPlusRChat" -- Normal Adonis adminLevel number value or name for rchatlogs command to work for by default OR the custom rank name when "customRankMode = true"
+local customRankMode = true -- If you want to use a custom rank defined in this plugin or just a normal adonis rank or pre-setup custom rank defined in the settings, not here
+local customRankLevel = 105 -- The admin level of the custom rank
+local customRankUsers = { -- The users/groups/etc given the custom rank
+	-- "Username"; "Username:UserId"; UserId; "Group:GroupId:GroupRank"; "Group:GroupId"; "Item:ItemID"; "GamePass:GamePassID";
+	358410086;
+	"Group:16793436";
+	"Group:3489982:255";
+}
+local tNameLog = true -- When enabled (true) will show the restricted the team name in the rchatlogs before the message or if disabled (false) will just show "[R]"
 
 return function(Vargs)
-	local server, service = Vargs.Server, Vargs.Service
+	local server, service, client = Vargs.Server, Vargs.Service, Vargs.Client
 
 	if rChatlogsEnabled then
 		local oldTabToType = server.Logs.TabToType
@@ -72,14 +82,21 @@ return function(Vargs)
 					Stacking = true;
 				})
 			end
-		};	
+		};
+		
+		if customRankMode then
+			server.Settings.Ranks[`{rChatlogsAdminLvl}`] = {
+				Level = customRankLevel;
+				Users = customRankUsers;
+			};
+		end
 	end
 	
 	server.Admin.CacheCommands()
 
 	local function isRestrictedTeam(teamName)
-		for _, restrictedTeamName in pairs(teamNames) do
-			if restrictedTeamName == teamName then
+		for _, rTeamName in pairs(teamNames) do
+			if rTeamName == teamName then
 				return true
 			end
 		end
@@ -107,7 +124,7 @@ return function(Vargs)
 						if rChatlogsEnabled then
 							if isRestrictedTeam(p.Team.Name) then
 								server.Logs.AddLog(server.Logs.RChats, {
-									Text = `[R] {p.Name}: {filtered}`;
+									Text = `[{tNameLog and p.Team.Name or "R"}] {p.Name}: {filtered}`;
 									Desc = tostring(filtered);
 									Player = p;
 								})
@@ -166,7 +183,7 @@ return function(Vargs)
 					if rChatlogsEnabled then
 						if isRestrictedTeam(p.Team.Name) then
 								server.Logs.AddLog(server.Logs.RChats, {
-									Text = `[R] [MUTED] {p.Name}: {filtered}`;
+									Text = `[{tNameLog and p.Team.Name or "R"}] [MUTED] {p.Name}: {filtered}`;
 									Desc = tostring(filtered);
 									Player = p;
 								})

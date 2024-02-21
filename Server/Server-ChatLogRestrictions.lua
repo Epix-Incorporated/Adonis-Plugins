@@ -92,8 +92,6 @@ return function(Vargs)
 		end
 	end
 	
-	server.Admin.CacheCommands()
-
 	local function isRestrictedTeam(teamName)
 		for _, rTeamName in pairs(teamNames) do
 			if rTeamName == teamName then

@@ -73,10 +73,10 @@ return function(Vargs)
 		end
 
 		char.DescendantAdded:Connect(function(obj)
-			applyCharPartCGroup(obj, plr)
+			applyCharPartCGroup(plr,obj)
 		end)
 		for _, obj in char:GetDescendants() do
-			applyCharPartCGroup(obj, plr)
+			applyCharPartCGroup(plr,obj)
 		end
 	end)
 

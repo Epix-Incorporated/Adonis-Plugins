@@ -22,7 +22,7 @@ return function(Vargs)
 
 	local PhysicsService: PhysicsService = service.PhysicsService
 
-	if PhysicsService:GetMaxCollisionGroups() < #PhysicsService:GetCollisionGroups() + 2 then
+	if PhysicsService:GetMaxCollisionGroups() < #PhysicsService:GetRegisteredCollisionGroups() + 2 then
 		warn("PLAYERCOLLISIONS PLUGIN ABORTED; TOO MANY EXISTING COLLISION GROUPS ARE IN THE GAME")
 		return
 	end
@@ -33,11 +33,9 @@ return function(Vargs)
 	local playerCollidableStates: {[Player]: boolean} = {}
 
 	local function applyCharPartCGroup(plr: Player, obj: Instance)
-		if obj:IsA("BasePart") then
-			PhysicsService:SetPartCollisionGroup(obj, if playerCollidableStates[plr]
-				then COLLISION_GROUP_1_NAME
+		if obj:IsA("BasePart") or obj:IsA('UnionOperation') then
+			obj.CollisionGroup = if playerCollidableStates[plr] then COLLISION_GROUP_1_NAME
 				else COLLISION_GROUP_2_NAME
-			)
 		end
 	end
 
@@ -48,7 +46,7 @@ return function(Vargs)
 		playerCollidableStates[plr] = collidable
 		if plr.Character then
 			for _, obj in plr.Character:GetDescendants() do
-				applyCharPartCGroup(obj, plr)
+				applyCharPartCGroup(plr,obj)
 			end
 		end
 		if Settings.CommandFeedback then
@@ -63,8 +61,8 @@ return function(Vargs)
 		end
 	end
 
-	PhysicsService:CreateCollisionGroup(COLLISION_GROUP_1_NAME)
-	PhysicsService:CreateCollisionGroup(COLLISION_GROUP_2_NAME)
+	PhysicsService:RegisterCollisionGroup(COLLISION_GROUP_1_NAME)
+	PhysicsService:RegisterCollisionGroup(COLLISION_GROUP_2_NAME)
 	PhysicsService:CollisionGroupSetCollidable(COLLISION_GROUP_1_NAME, COLLISION_GROUP_1_NAME, true)
 	PhysicsService:CollisionGroupSetCollidable(COLLISION_GROUP_1_NAME, COLLISION_GROUP_2_NAME, false)
 	PhysicsService:CollisionGroupSetCollidable(COLLISION_GROUP_2_NAME, COLLISION_GROUP_2_NAME, false)
@@ -75,10 +73,10 @@ return function(Vargs)
 		end
 
 		char.DescendantAdded:Connect(function(obj)
-			applyCharPartCGroup(obj, plr)
+			applyCharPartCGroup(plr,obj)
 		end)
 		for _, obj in char:GetDescendants() do
-			applyCharPartCGroup(obj, plr)
+			applyCharPartCGroup(plr,obj)
 		end
 	end)
 

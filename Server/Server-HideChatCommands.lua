@@ -32,8 +32,7 @@
 
 return function(Vargs)
 	local server, service = Vargs.Server, Vargs.Service
-	local Admin, Remote = server.Admin, server.Remote
-
+	local Admin, Remote, Core, Settings, Variables = server.Admin, server.Remote, server.Core, server.Settings, server.Variables
 	Admin.DoHideChatCmd = function(p: Player, message: string, data: {[string]: any}?)
 		local hideCommands = (data or Core.GetPlayer(p)).Client.HideChatCommands
 		if hideCommands == nil or hideCommands == true then
@@ -51,7 +50,7 @@ return function(Vargs)
 			end
 		end
 	end
-
+	
 	service.HookEvent("CharacterAdded", function(player: Player)
 		--// Doesn't save unless sent to server by player
 		if player.Client.HideChatCommands == nil then

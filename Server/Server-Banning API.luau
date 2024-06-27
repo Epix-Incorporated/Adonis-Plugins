@@ -22,7 +22,7 @@ return function(Vargs)
 		UseBackupDatastore = true; -- Save to Datastore anyway
 		
 		LoadBansFromDatastore = true; 
-		-- Make it so datastore doesn't actually load bans so it doesn't interfer with BanningAPI
+		-- Make it so datastore doesn't actually load bans so it doesn't interfere with BanningAPI
 		-- Be warned; it does not allow you to see who is banned as it's not something you can iterate through easily
 		-- A more official system IS coming, this is just temporary. I recommend keeping this enabled 
 		-- 							unless you're having trouble unbanning people.

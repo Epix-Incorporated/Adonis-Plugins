@@ -1031,7 +1031,7 @@ local function typeWriterTween()
 
 	for i = 1, textLength do		
 		local currentChar = text:sub(i, i)
-		print(currentChar)
+		-- print(currentChar)
 
 		if waitTimes[currentChar] then
 			if i > startChar then

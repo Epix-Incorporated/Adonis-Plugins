@@ -1,0 +1,1080 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<Meta name="ExplicitAutoJoints">true</Meta>
+	<External>null</External>
+	<External>nil</External>
+	<Item class="ModuleScript" referent="RBXE277FD2198024C848C6E38F8AF8E75A1">
+		<Properties>
+			<BinaryString name="AttributesSerialize"></BinaryString>
+			<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+			<bool name="DefinesCapabilities">false</bool>
+			<Content name="LinkedSource"><null></null></Content>
+			<string name="Name">Server-EffectsPlus</string>
+			<string name="ScriptGuid">{BB19451B-67F3-478E-94C1-FE949CCFC00A}</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	SERVER PLUGINS' NAMES MUST START WITH "Server:" OR "Server-"
+	CLIENT PLUGINS' NAMES MUST START WITH "Client:" OR "Client-"
+
+	Plugins have full access to the server/client tables and most variables.
+
+	You can use the MakePluginEvent to use the script instead of setting up an event.
+	PlayerJoined will fire after the player finishes initial loading
+	CharacterAdded will also fire after the player is loaded, it does not use the CharacterAdded event.
+
+	service.Events.PlayerAdded(function(p)
+		print(`{p.Name} Joined! Example Plugin`)
+	end)
+
+	service.Events.CharacterAdded(function(p)
+		server.RunCommand('name', plr.Name, 'BobTest Example Plugin')
+	end)
+
+--]]
+
+-- Lookup Tables
+EasingStyles = {
+	[0] = Enum.EasingStyle.Linear,
+	[1] = Enum.EasingStyle.Sine,
+	[2] = Enum.EasingStyle.Back,
+	[3] = Enum.EasingStyle.Quad,
+	[4] = Enum.EasingStyle.Quart,
+	[5] = Enum.EasingStyle.Quint,
+	[6] = Enum.EasingStyle.Bounce,
+	[7] = Enum.EasingStyle.Elastic,
+	[8] = Enum.EasingStyle.Exponential,
+	[9] = Enum.EasingStyle.Circular,
+	[10] = Enum.EasingStyle.Cubic,
+	["linear"] = Enum.EasingStyle.Linear,
+	["sine"] = Enum.EasingStyle.Sine,
+	["back"] = Enum.EasingStyle.Back,
+	["quad"] = Enum.EasingStyle.Quad,
+	["quart"] = Enum.EasingStyle.Quart,
+	["quint"] = Enum.EasingStyle.Quint,
+	["bounce"] = Enum.EasingStyle.Bounce,
+	["elastic"] = Enum.EasingStyle.Elastic,
+	["exponential"] = Enum.EasingStyle.Exponential,
+	["circular"] = Enum.EasingStyle.Circular,
+	["cubic"] = Enum.EasingStyle.Cubic
+}
+
+EasingDirection = {
+	[0] = Enum.EasingDirection.In,
+	[1] = Enum.EasingDirection.Out,
+	[2] = Enum.EasingDirection.InOut,
+	["in"] = Enum.EasingDirection.In,
+	["out"] = Enum.EasingDirection.Out,
+	["inout"] = Enum.EasingDirection.InOut
+}
+
+YesNo = {
+	[0] = false,
+	[1] = true,
+	["t"] = true,
+	["f"] = false,
+	["true"] = true,
+	["false"] = false,
+	["y"] = true,
+	["n"] = false,
+	["yes"] = true,
+	["no"] = false
+}
+
+-- Commands
+
+return function(Vargs)
+	local server, service = Vargs.Server, Vargs.Service
+	
+	local Settings = server.Settings
+	local Functions, Commands, Admin, Anti, Core, HTTP, Logs, Remote, Process, Variables, Deps =
+		server.Functions, server.Commands, server.Admin, server.Anti, server.Core, server.HTTP, server.Logs, server.Remote, server.Process, server.Variables, server.Deps
+	
+	-- Tweens
+	local TweenService = game:GetService("TweenService")
+	
+	local activeTweens = {}
+
+	local function createTween(instance, property, targetValue, tweenInfo)
+		-- Create the tween
+		local tween = TweenService:Create(instance, tweenInfo, {[property] = targetValue})
+
+		-- Store the tween in the table, indexed by instance and property
+		activeTweens[instance] = activeTweens[instance] or {}
+		activeTweens[instance][property] = tween
+
+		-- Play the tween
+		tween:Play()
+	end
+
+	local function cancelTween(instance, property)
+		if activeTweens[instance] and activeTweens[instance][property] then
+			-- Cancel the tween affecting the specified property
+			activeTweens[instance][property]:Cancel()
+
+			-- Remove the tween from the table
+			activeTweens[instance][property] = nil
+		end
+	end
+
+
+	Commands.TweenVolume = {
+		Prefix = Settings.Prefix;	-- Prefix to use for command
+		Commands = {"tweenvolume", "tvol"};	-- Commands
+		Args = {"volume", "speed", "repeats", "reverse (Y/N)", "style", "direction"};	-- Command arguments
+		Description = "(FX+) Changes the volume to the given value within a set timeframe";	-- Command Description
+		Hidden = false; -- Is it hidden from the command list?
+		Fun = false;	-- Is it fun?
+		AdminLevel = "Moderators";	    -- Admin level; If using settings.CustomRanks set this to the custom rank name (eg. "Baristas")
+		Function = function(plr,args)    -- Function to run for command		
+			local sound = game.SoundService:FindFirstChild("ADONIS_SOUND")
+			local volume = tonumber(args[1])
+			
+			if sound and volume then
+				local speed = tonumber(args[2]) or 1
+				local style = EasingStyles[string.lower(args[5] or "linear")]
+				local direction = EasingDirection[string.lower(args[6] or "in")]
+				local repeats = tonumber(args[3]) or 0
+				local reverse = YesNo[string.lower(args[4] or "no")]
+				
+				local tweenInfo = TweenInfo.new(
+					speed,
+					style,
+					direction,
+					repeats,
+					reverse
+				)
+				
+				cancelTween(sound, "Volume")
+				createTween(sound,"Volume",volume,tweenInfo)
+			end
+		end
+	}
+	
+	Commands.TweenPitch = {
+		Prefix = Settings.Prefix;	-- Prefix to use for command
+		Commands = {"tweenpitch","tpitch"};	-- Commands
+		Args = {"pitch", "speed", "repeats", "reverse (Y/N)", "style", "direction"};	-- Command arguments
+		Description = "(FX+) Changes the pitch to the given value within a set timeframe";	-- Command Description
+		Hidden = false; -- Is it hidden from the command list?
+		Fun = false;	-- Is it fun?
+		AdminLevel = "Moderators";	    -- Admin level; If using settings.CustomRanks set this to the custom rank name (eg. "Baristas")
+		Function = function(plr,args)    -- Function to run for command		
+			local sound = game.SoundService:FindFirstChild("ADONIS_SOUND")
+			local pitch = tonumber(args[1])
+
+			if sound and pitch then
+				local speed = tonumber(args[2]) or 1
+				local style = EasingStyles[string.lower(args[5] or "linear")]
+				local direction = EasingDirection[string.lower(args[6] or "in")]
+				local repeats = tonumber(args[3]) or 0
+				local reverse = YesNo[string.lower(args[4] or "no")]
+
+				local tweenInfo = TweenInfo.new(
+					speed,
+					style,
+					direction,
+					repeats,
+					reverse
+				)
+				
+				cancelTween(sound, "Pitch")
+				createTween(sound,"Pitch",pitch,tweenInfo)
+			else
+				return
+			end
+		end
+	}
+	
+	Commands.TweenBlind = {
+		Prefix = Settings.Prefix;	-- Prefix to use for command
+		Commands = {"tweenblind","tblind"};	-- Commands
+		Args = {"player", "speed", "repeats", "reverse (Y/N)", "style", "direction"};	-- Command arguments
+		Description = "(FX+) Blinds the target player(s) at the given speed";	-- Command Description
+		Hidden = false; -- Is it hidden from the command list?
+		Fun = true;	-- Is it fun?
+		AdminLevel = "Moderators";	    -- Admin level; If using settings.CustomRanks set this to the custom rank name (eg. "Baristas")
+		Function = function(plr,args)    -- Function to run for command
+			local speed = tonumber(args[2]) or 1
+			local style = EasingStyles[string.lower(args[5] or "linear")]
+			local direction = EasingDirection[string.lower(args[6] or "in")]
+			local repeats = tonumber(args[3]) or 0
+			local reverse = YesNo[string.lower(args[4] or "no")]
+
+			local tweenInfo = TweenInfo.new(
+				speed,
+				style,
+				direction,
+				repeats,
+				reverse
+			)
+			
+			for i,v in service.GetPlayers(plr,args[1]) do
+				local bg = v.PlayerGui:FindFirstChild("ADONIS_TweenBlind")
+				if bg then cancelTween(bg.Frame, "BackgroundTransparency"); bg:Destroy() end
+				
+				local bg = script.ADONIS_TweenBlind:Clone()
+				bg.Parent = v.PlayerGui
+				createTween(bg.Frame,"BackgroundTransparency",0,tweenInfo)
+			end	
+		end
+	}
+	
+	Commands.UnTweenBlind = {
+		Prefix = Settings.Prefix;	-- Prefix to use for command
+		Commands = {"untweenblind","untblind"};	-- Commands
+		Args = {"player", "speed", "repeats", "reverse (Y/N)", "style", "direction"};	-- Command arguments
+		Description = "(FX+) Blinds the target player(s) at the given speed";	-- Command Description
+		Hidden = false; -- Is it hidden from the command list?
+		Fun = true;	-- Is it fun?
+		AdminLevel = "Moderators";	    -- Admin level; If using settings.CustomRanks set this to the custom rank name (eg. "Baristas")
+		Function = function(plr,args)    -- Function to run for command
+			local speed = tonumber(args[2]) or 1
+			local style = EasingStyles[string.lower(args[5] or "linear")]
+			local direction = EasingDirection[string.lower(args[6] or "in")]
+			local repeats = tonumber(args[3]) or 0
+			local reverse = YesNo[string.lower(args[4] or "no")]
+
+			local tweenInfo = TweenInfo.new(
+				speed,
+				style,
+				direction,
+				repeats,
+				reverse
+			)
+
+			for i,v in service.GetPlayers(plr,args[1]) do
+				local bg = v.PlayerGui:FindFirstChild("ADONIS_TweenBlind")
+				if bg then 
+					cancelTween(bg.Frame, "BackgroundTransparency")
+					createTween(bg.Frame,"BackgroundTransparency",1,tweenInfo)
+				end
+			end	
+		end
+	}
+	
+	Commands.ScreenImage = {
+		Prefix = Settings.Prefix;
+		Commands = {"screenimage", "scrimage", "image", "img"};
+		Args = {"player", "textureid", "transparency", "RGB"};
+		Description = "(FX+) Places the desired image on the target's screen";
+		Fun = true;
+		AdminLevel = "Moderators";
+		Function = function(plr: Player, args: {string})
+			local img = tostring(args[2]) or "0"
+			local trans = tonumber(args[3]) or 0
+			
+			local color = Color3.fromRGB(255,255,255)
+			
+			if args[4] then
+				local colorValues = string.split(args[4], ",")
+				local r = tonumber(colorValues[1]) or 255
+				local g = tonumber(colorValues[2]) or r
+				local b = tonumber(colorValues[3]) or (r+g)/2
+				color = Color3.fromRGB(r,g,b)
+			end
+
+			for i,v in service.GetPlayers(plr,args[1]) do
+				local bg = v.PlayerGui:FindFirstChild("ADONIS_ScreenImage")
+				if bg then bg:Destroy() end
+				if img ~= "0" and img ~= "" then
+					local bg = script.ADONIS_ScreenImage:Clone()
+					bg.Parent = v.PlayerGui
+					bg.ImageLabel.Image = "rbxassetid://" .. img
+					bg.ImageLabel.ImageTransparency = trans
+					bg.ImageLabel.ImageColor3 = color					
+				else
+					Functions.Hint("Removed screenimage from given player(s)",{plr})
+				end
+			end
+		end
+	}
+	
+	Commands.TweenImage = {
+		Prefix = Settings.Prefix;
+		Commands = {"tweenimage" , "timg"};
+		Args = {"player", "transparency", "color3 (255,255,255)", "speed", "repeats", "reverse (Y/N)",  "style", "direction"};
+		Description = "Places the desired image on the target's screen";
+		Fun = true;
+		AdminLevel = "Moderators";
+		Function = function(plr: Player, args: {string})
+			local trans = tonumber(args[2]) or 0
+			
+			local color = Color3.fromRGB(255,255,255)
+
+			if args[3] then
+				local colorValues = string.split(args[3], ",")
+				local r = tonumber(colorValues[1]) or 255
+				local g = tonumber(colorValues[2]) or r
+				local b = tonumber(colorValues[3]) or (r+g)/2
+				color = Color3.fromRGB(r,g,b)
+			end
+			
+			local speed = tonumber(args[4]) or 3
+			local style = EasingStyles[string.lower(args[7] or "linear")]
+			local direction = EasingDirection[string.lower(args[8] or "in")]
+			local repeats = tonumber(args[5]) or 0
+			local reverse = YesNo[string.lower(args[6] or "no")]
+
+			local tweenInfo = TweenInfo.new(
+				speed,
+				style,
+				direction,
+				repeats,
+				reverse
+			)
+
+			for i,v in service.GetPlayers(plr,args[1]) do
+				local bg = v.PlayerGui:FindFirstChild("ADONIS_ScreenImage")
+				if bg then
+					cancelTween(bg.ImageLabel,"ImageTransparency")
+					cancelTween(bg.ImageLabel,"ImageColor3")
+					
+					createTween(bg.ImageLabel,"ImageTransparency",trans,tweenInfo)
+					createTween(bg.ImageLabel,"ImageColor3",color,tweenInfo)
+				end
+			end	
+		end
+	}
+	
+	Commands.Typewriter = {
+    Prefix = Settings.Prefix;
+    Commands = {"typewriter", "visualnovel", "tw", "vn"};
+    Args = {"alignment", "speed", "message"};
+    Description = "(FX+) Displays text grapheme-by-grapheme at the given speed";
+    Fun = false;
+    AdminLevel = "Moderators";
+    Function = function(plr: Player, args: {string})
+        local align = args[1] or "center"
+        local speed = tonumber(args[2]) or 1
+        local messageText = service.BroadcastFilter(assert(args[3], "Missing message"), plr) -- pass the text through a filter before applying
+
+        -- Clone the message template for each player
+        for _, v in pairs(game.Players:GetPlayers()) do
+            local msg = script.ADONIS_Message:Clone()
+            msg.Parent = v.PlayerGui
+            
+            local msgText = msg.Frame.Message
+            msgText.Text = messageText
+
+            -- Set text alignment
+            if string.lower(align) == "l" or string.lower(align) == "left" then
+                msgText.TextXAlignment = Enum.TextXAlignment.Left
+            elseif string.lower(align) == "r" or string.lower(align) == "right" then
+                msgText.TextXAlignment = Enum.TextXAlignment.Right
+            else
+                msgText.TextXAlignment = Enum.TextXAlignment.Center
+            end
+            
+            msgText:SetAttribute("textSpeed", speed)
+        end
+    end
+}
+
+	
+	Commands.UnEffect = {
+		Prefix = Settings.Prefix;
+		Commands = {"uneffect", "unimage", "uneffectgui", "unspook", "unblind", "unstrobe", "untrippy", "unpixelize", "unlowres", "unpixel", "undance", "unflashify", "guifix", "fixgui"};
+		Args = {"player"};
+		Description = "(FX+) Removes any effect GUIs on the target player(s)";
+		Fun = true;
+		AdminLevel = "Moderators";
+		Function = function(plr: Player, args: {string})
+			for i, v in service.GetPlayers(plr, args[1]) do
+				Remote.MakeGui(v, "Effect", {Mode = "Off";})
+				Functions.StopAnimation(v)
+				local bg = v.PlayerGui:FindFirstChild("ADONIS_TweenBlind")
+				if bg then
+					cancelTween(bg.Frame,"BackgroundTransparency")
+					bg:Destroy()
+				end
+				bg = v.PlayerGui:FindFirstChild("ADONIS_ScreenImage")
+				if bg then
+					cancelTween(bg.ImageLabel,"ImageTransparency")
+					cancelTween(bg.ImageLabel,"ImageColor3")
+					bg:Destroy()
+				end
+				bg = v.PlayerGui:FindFirstChild("ADONIS_Message")
+				if bg then 
+					cancelTween(bg.Frame.Message,"MaxVisibleGraphemes")
+					cancelTween(bg.Frame.Message,"TextTransparency")
+					bg:Destroy() 
+				end
+			end
+		end
+	}
+	
+	Commands.Pitch = {
+		Prefix = Settings.Prefix;
+		Commands = {"pitch"};
+		Args = {"number"};
+		Description = "Change the pitch of the currently playing song";
+		AdminLevel = "Moderators";
+		Function = function(plr: Player, args: {string})
+			local pitch = args[1]
+			for i, v in service.SoundService:GetChildren() do
+				if v.Name=="ADONIS_SOUND" then
+					cancelTween(v,"Pitch")
+					
+					if string.sub(args[1], 1, 1) == "+" then
+						v.Pitch=v.Pitch+tonumber(string.sub(args[1], 2))
+					elseif string.sub(args[1], 1, 1) == "-" then
+						v.Pitch=v.Pitch-tonumber(string.sub(args[1], 2))
+					else
+						v.Pitch = pitch
+					end
+
+				end
+			end
+		end
+	}
+	
+	Commands.Volume = {
+		Prefix = Settings.Prefix;
+		Commands = {"volume", "vol"};
+		Args = {"number"};
+		Description = "Change the volume of the currently playing song";
+		AdminLevel = "Moderators";
+		Function = function(plr: Player, args: {string})
+			local volume = assert(tonumber(args[1]), "Volume must be a valid number")
+
+			for i, v in service.SoundService:GetChildren() do
+				if v.Name=="ADONIS_SOUND" then
+					cancelTween(v,"Volume")
+					
+					if string.sub(args[1], 1, 1) == "+" then
+						v.Volume=v.Volume+tonumber(string.sub(args[1], 2))
+					elseif string.sub(args[1], 1, 1) == "-" then
+						v.Volume=v.Volume-tonumber(string.sub(args[1], 2))
+					else
+						v.Volume = volume
+					end
+				end
+			end
+		end
+	}
+	
+	Commands.CustomRobloxNotify = {
+		Prefix = Settings.Prefix;
+		Commands = {"customrbxnotify","crn"};
+		Args = {"player", "duration (seconds)", "title", "text"};
+		Filter = true;
+		Description = "Sends a Roblox-styled notification for the target player(s)";
+		AdminLevel = "Admins";
+		Function = function(plr: Player, args: {string})
+			local title = service.BroadcastFilter(assert(args[3], "Missing title"), plr)
+			if string.lower(title) == "active" then
+				title = "ACTIVE SKILL"			
+			end
+			for _, v in service.GetPlayers(plr, args[1]) do
+				Remote.Send(v, "Function", "SetCore", "SendNotification", {
+					Title = title;
+					Text = service.BroadcastFilter(args[4], plr) or "Hello, from Adonis!"; -- add filter
+					Duration = tonumber(assert(args[2], 5));
+				})
+			end
+		end
+	};
+	
+	Commands.ZaWarudo = {
+		Prefix = Settings.Prefix;
+		Commands = {"zawarudo", "stoptime"};
+		Args = {"players"}; -- Allow multiple players
+		Fun = true;
+		Description = "Freezes everything but the specified players";
+		AdminLevel = "Admins";
+		Function = function(plr: Player, args: {string})
+			local playersToExclude = service.GetPlayers(plr, args[1]) -- Get the players to exclude from freezing
+
+			local doPause; doPause = function(obj)
+				-- Only freeze objects not belonging to the specified players
+				if obj:IsA("BasePart") and not obj.Anchored then
+					local isExcluded = false
+					for _, player in playersToExclude do
+						if obj:IsDescendantOf(player.Character) then
+							isExcluded = true
+							break
+						end
+					end
+
+					if not isExcluded then
+						obj.Anchored = true
+						table.insert(Variables.FrozenObjects, obj)
+					end
+				end
+
+				-- Recursively check children of the object
+				for _, v in ipairs(obj:GetChildren()) do
+					doPause(v)
+				end
+			end
+
+			if not Variables.ZaWarudoDebounce then
+				Variables.ZaWarudoDebounce = true
+				task.delay(10, function() Variables.ZaWarudoDebounce = false end)
+
+				if Variables.ZaWarudo then
+					-- Unfreeze objects and cleanup code
+					local audio = service.New("Sound", service.SoundService)
+					audio.SoundId = "rbxassetid://676242549"
+					audio.Volume = 0.5
+					audio:Play()
+					task.wait(2)
+					for _, part in ipairs(Variables.FrozenObjects) do
+						part.Anchored = false
+					end
+
+					local old = service.Lighting:FindFirstChild("ADONIS_ZAWARUDO")
+					if old then
+						for i = -2, 0, 0.1 do
+							old.Saturation = i
+							task.wait(0.01)
+						end
+						old:Destroy()
+					end
+
+					local audio = service.SoundService:FindFirstChild("ADONIS_CLOCK_AUDIO")
+					if audio then
+						audio:Stop()
+						audio:Destroy()
+					end
+
+					Variables.ZaWarudo:Disconnect()
+					Variables.FrozenObjects = {}
+					Variables.ZaWarudo = false
+					audio:Destroy()
+				else
+					-- Freeze objects and setup Za Warudo effect
+					local audio = service.New("Sound", service.SoundService)
+					audio.SoundId = "rbxassetid://676242549"
+					audio.Volume = 0.5
+					audio:Play()
+					task.wait(2.25)
+					doPause(workspace)
+					Variables.ZaWarudo = game.DescendantAdded:Connect(function(c)
+						if c:IsA("BasePart") and not c.Anchored and c.Name ~= "HumanoidRootPart" then
+							local isExcluded = false
+							for _, player in playersToExclude do
+								if c:IsDescendantOf(player.Character) then
+									isExcluded = true
+									break
+								end
+							end
+
+							if not isExcluded then
+								c.Anchored = true
+								table.insert(Variables.FrozenObjects, c)
+							end
+						end
+					end)
+
+					local cc = service.New("ColorCorrectionEffect", service.Lighting)
+					cc.Name = "ADONIS_ZAWARUDO"
+					for i = 0, -2, -0.1 do
+						cc.Saturation = i
+						task.wait(0.01)
+					end
+
+					audio:Destroy()
+					local clock = service.New("Sound", service.SoundService)
+					clock.Name = "ADONIS_CLOCK_AUDIO"
+					clock.SoundId = "rbxassetid://8966275754"
+					clock.Looped = true
+					clock.Volume = 1
+					clock:Play()
+				end
+				Variables.ZaWarudoDebounce = false
+			end
+		end
+	}
+;
+end]]></ProtectedString>
+			<int64 name="SourceAssetId">-1</int64>
+			<BinaryString name="Tags"></BinaryString>
+		</Properties>
+		<Item class="ScreenGui" referent="RBXAECF7F514F484B2BB35329FA2DC6529F">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<bool name="AutoLocalize">true</bool>
+				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+				<bool name="ClipToDeviceSafeArea">true</bool>
+				<bool name="DefinesCapabilities">false</bool>
+				<int name="DisplayOrder">0</int>
+				<bool name="Enabled">true</bool>
+				<string name="Name">ADONIS_TweenBlind</string>
+				<bool name="ResetOnSpawn">true</bool>
+				<Ref name="RootLocalizationTable">null</Ref>
+				<token name="SafeAreaCompatibility">1</token>
+				<token name="ScreenInsets">2</token>
+				<token name="SelectionBehaviorDown">0</token>
+				<token name="SelectionBehaviorLeft">0</token>
+				<token name="SelectionBehaviorRight">0</token>
+				<token name="SelectionBehaviorUp">0</token>
+				<bool name="SelectionGroup">false</bool>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<token name="ZIndexBehavior">1</token>
+			</Properties>
+			<Item class="Frame" referent="RBX28305B533ACC4B07BFBCD56CF2563CD6">
+				<Properties>
+					<bool name="Active">false</bool>
+					<Vector2 name="AnchorPoint">
+						<X>0</X>
+						<Y>0</Y>
+					</Vector2>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<bool name="AutoLocalize">true</bool>
+					<token name="AutomaticSize">0</token>
+					<Color3 name="BackgroundColor3">
+						<R>0</R>
+						<G>0</G>
+						<B>0</B>
+					</Color3>
+					<float name="BackgroundTransparency">1</float>
+					<Color3 name="BorderColor3">
+						<R>0</R>
+						<G>0</G>
+						<B>0</B>
+					</Color3>
+					<token name="BorderMode">0</token>
+					<int name="BorderSizePixel">0</int>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="ClipsDescendants">false</bool>
+					<bool name="DefinesCapabilities">false</bool>
+					<bool name="Draggable">false</bool>
+					<bool name="Interactable">true</bool>
+					<int name="LayoutOrder">0</int>
+					<string name="Name">Frame</string>
+					<Ref name="NextSelectionDown">null</Ref>
+					<Ref name="NextSelectionLeft">null</Ref>
+					<Ref name="NextSelectionRight">null</Ref>
+					<Ref name="NextSelectionUp">null</Ref>
+					<UDim2 name="Position">
+						<XS>-5</XS>
+						<XO>0</XO>
+						<YS>-5</YS>
+						<YO>0</YO>
+					</UDim2>
+					<Ref name="RootLocalizationTable">null</Ref>
+					<float name="Rotation">0</float>
+					<bool name="Selectable">false</bool>
+					<token name="SelectionBehaviorDown">0</token>
+					<token name="SelectionBehaviorLeft">0</token>
+					<token name="SelectionBehaviorRight">0</token>
+					<token name="SelectionBehaviorUp">0</token>
+					<bool name="SelectionGroup">false</bool>
+					<Ref name="SelectionImageObject">null</Ref>
+					<int name="SelectionOrder">0</int>
+					<UDim2 name="Size">
+						<XS>10</XS>
+						<XO>0</XO>
+						<YS>10</YS>
+						<YO>0</YO>
+					</UDim2>
+					<token name="SizeConstraint">0</token>
+					<int64 name="SourceAssetId">-1</int64>
+					<token name="Style">0</token>
+					<BinaryString name="Tags"></BinaryString>
+					<bool name="Visible">true</bool>
+					<int name="ZIndex">10</int>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="ScreenGui" referent="RBXC8349FAC0B7940B4AC043FC94CA36696">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<bool name="AutoLocalize">true</bool>
+				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+				<bool name="ClipToDeviceSafeArea">true</bool>
+				<bool name="DefinesCapabilities">false</bool>
+				<int name="DisplayOrder">0</int>
+				<bool name="Enabled">true</bool>
+				<string name="Name">ADONIS_ScreenImage</string>
+				<bool name="ResetOnSpawn">true</bool>
+				<Ref name="RootLocalizationTable">null</Ref>
+				<token name="SafeAreaCompatibility">1</token>
+				<token name="ScreenInsets">2</token>
+				<token name="SelectionBehaviorDown">0</token>
+				<token name="SelectionBehaviorLeft">0</token>
+				<token name="SelectionBehaviorRight">0</token>
+				<token name="SelectionBehaviorUp">0</token>
+				<bool name="SelectionGroup">false</bool>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<token name="ZIndexBehavior">1</token>
+			</Properties>
+			<Item class="ImageLabel" referent="RBXC7E3A0D44F864E7683488D634AB0F913">
+				<Properties>
+					<bool name="Active">false</bool>
+					<Vector2 name="AnchorPoint">
+						<X>0</X>
+						<Y>0</Y>
+					</Vector2>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<bool name="AutoLocalize">true</bool>
+					<token name="AutomaticSize">0</token>
+					<Color3 name="BackgroundColor3">
+						<R>1</R>
+						<G>1</G>
+						<B>1</B>
+					</Color3>
+					<float name="BackgroundTransparency">1</float>
+					<Color3 name="BorderColor3">
+						<R>0</R>
+						<G>0</G>
+						<B>0</B>
+					</Color3>
+					<token name="BorderMode">0</token>
+					<int name="BorderSizePixel">0</int>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="ClipsDescendants">false</bool>
+					<bool name="DefinesCapabilities">false</bool>
+					<bool name="Draggable">false</bool>
+					<Content name="Image"><url>rbxasset://textures/ui/GuiImagePlaceholder.png</url></Content>
+					<Color3 name="ImageColor3">
+						<R>1</R>
+						<G>1</G>
+						<B>1</B>
+					</Color3>
+					<Vector2 name="ImageRectOffset">
+						<X>0</X>
+						<Y>0</Y>
+					</Vector2>
+					<Vector2 name="ImageRectSize">
+						<X>0</X>
+						<Y>0</Y>
+					</Vector2>
+					<float name="ImageTransparency">0</float>
+					<bool name="Interactable">true</bool>
+					<int name="LayoutOrder">0</int>
+					<string name="Name">ImageLabel</string>
+					<Ref name="NextSelectionDown">null</Ref>
+					<Ref name="NextSelectionLeft">null</Ref>
+					<Ref name="NextSelectionRight">null</Ref>
+					<Ref name="NextSelectionUp">null</Ref>
+					<UDim2 name="Position">
+						<XS>0</XS>
+						<XO>0</XO>
+						<YS>-0.100000001</YS>
+						<YO>0</YO>
+					</UDim2>
+					<token name="ResampleMode">0</token>
+					<Ref name="RootLocalizationTable">null</Ref>
+					<float name="Rotation">0</float>
+					<token name="ScaleType">0</token>
+					<bool name="Selectable">false</bool>
+					<token name="SelectionBehaviorDown">0</token>
+					<token name="SelectionBehaviorLeft">0</token>
+					<token name="SelectionBehaviorRight">0</token>
+					<token name="SelectionBehaviorUp">0</token>
+					<bool name="SelectionGroup">false</bool>
+					<Ref name="SelectionImageObject">null</Ref>
+					<int name="SelectionOrder">0</int>
+					<UDim2 name="Size">
+						<XS>1</XS>
+						<XO>0</XO>
+						<YS>1.10000002</YS>
+						<YO>0</YO>
+					</UDim2>
+					<token name="SizeConstraint">0</token>
+					<Rect2D name="SliceCenter">
+						<min>
+							<X>0</X>
+							<Y>0</Y>
+						</min>
+						<max>
+							<X>0</X>
+							<Y>0</Y>
+						</max>
+					</Rect2D>
+					<float name="SliceScale">1</float>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UDim2 name="TileSize">
+						<XS>1</XS>
+						<XO>0</XO>
+						<YS>1</YS>
+						<YO>0</YO>
+					</UDim2>
+					<bool name="Visible">true</bool>
+					<int name="ZIndex">10</int>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="ScreenGui" referent="RBX25EBF890BDEC492EA9FA198C0ABC1BF2">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<bool name="AutoLocalize">true</bool>
+				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+				<bool name="ClipToDeviceSafeArea">true</bool>
+				<bool name="DefinesCapabilities">false</bool>
+				<int name="DisplayOrder">0</int>
+				<bool name="Enabled">true</bool>
+				<string name="Name">ADONIS_Message</string>
+				<bool name="ResetOnSpawn">true</bool>
+				<Ref name="RootLocalizationTable">null</Ref>
+				<token name="SafeAreaCompatibility">1</token>
+				<token name="ScreenInsets">2</token>
+				<token name="SelectionBehaviorDown">0</token>
+				<token name="SelectionBehaviorLeft">0</token>
+				<token name="SelectionBehaviorRight">0</token>
+				<token name="SelectionBehaviorUp">0</token>
+				<bool name="SelectionGroup">false</bool>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<token name="ZIndexBehavior">1</token>
+			</Properties>
+			<Item class="Frame" referent="RBXF736A9E8F5DE46768211B8DD18FC6780">
+				<Properties>
+					<bool name="Active">false</bool>
+					<Vector2 name="AnchorPoint">
+						<X>0</X>
+						<Y>0</Y>
+					</Vector2>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<bool name="AutoLocalize">true</bool>
+					<token name="AutomaticSize">0</token>
+					<Color3 name="BackgroundColor3">
+						<R>1</R>
+						<G>1</G>
+						<B>1</B>
+					</Color3>
+					<float name="BackgroundTransparency">1</float>
+					<Color3 name="BorderColor3">
+						<R>0</R>
+						<G>0</G>
+						<B>0</B>
+					</Color3>
+					<token name="BorderMode">0</token>
+					<int name="BorderSizePixel">0</int>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="ClipsDescendants">false</bool>
+					<bool name="DefinesCapabilities">false</bool>
+					<bool name="Draggable">false</bool>
+					<bool name="Interactable">true</bool>
+					<int name="LayoutOrder">0</int>
+					<string name="Name">Frame</string>
+					<Ref name="NextSelectionDown">null</Ref>
+					<Ref name="NextSelectionLeft">null</Ref>
+					<Ref name="NextSelectionRight">null</Ref>
+					<Ref name="NextSelectionUp">null</Ref>
+					<UDim2 name="Position">
+						<XS>0.0500000007</XS>
+						<XO>0</XO>
+						<YS>0.0500000007</YS>
+						<YO>0</YO>
+					</UDim2>
+					<Ref name="RootLocalizationTable">null</Ref>
+					<float name="Rotation">0</float>
+					<bool name="Selectable">false</bool>
+					<token name="SelectionBehaviorDown">0</token>
+					<token name="SelectionBehaviorLeft">0</token>
+					<token name="SelectionBehaviorRight">0</token>
+					<token name="SelectionBehaviorUp">0</token>
+					<bool name="SelectionGroup">false</bool>
+					<Ref name="SelectionImageObject">null</Ref>
+					<int name="SelectionOrder">0</int>
+					<UDim2 name="Size">
+						<XS>0.899999976</XS>
+						<XO>0</XO>
+						<YS>0.899999976</YS>
+						<YO>0</YO>
+					</UDim2>
+					<token name="SizeConstraint">0</token>
+					<int64 name="SourceAssetId">-1</int64>
+					<token name="Style">0</token>
+					<BinaryString name="Tags"></BinaryString>
+					<bool name="Visible">true</bool>
+					<int name="ZIndex">10</int>
+				</Properties>
+				<Item class="TextLabel" referent="RBX051B178F62C24381971F8347E4A522B4">
+					<Properties>
+						<bool name="Active">false</bool>
+						<Vector2 name="AnchorPoint">
+							<X>0</X>
+							<Y>0</Y>
+						</Vector2>
+						<BinaryString name="AttributesSerialize">AQAAAAkAAAB0ZXh0U3BlZWQFAAAAAA==</BinaryString>
+						<bool name="AutoLocalize">true</bool>
+						<token name="AutomaticSize">0</token>
+						<Color3 name="BackgroundColor3">
+							<R>1</R>
+							<G>1</G>
+							<B>1</B>
+						</Color3>
+						<float name="BackgroundTransparency">1</float>
+						<Color3 name="BorderColor3">
+							<R>0</R>
+							<G>0</G>
+							<B>0</B>
+						</Color3>
+						<token name="BorderMode">0</token>
+						<int name="BorderSizePixel">0</int>
+						<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+						<bool name="ClipsDescendants">false</bool>
+						<bool name="DefinesCapabilities">false</bool>
+						<bool name="Draggable">false</bool>
+						<Font name="FontFace">
+							<Family><url>rbxasset://fonts/families/GothamSSm.json</url></Family>
+							<Weight>600</Weight>
+							<Style>Normal</Style>
+						</Font>
+						<bool name="Interactable">true</bool>
+						<int name="LayoutOrder">0</int>
+						<float name="LineHeight">1</float>
+						<string name="LocalizationMatchIdentifier"></string>
+						<string name="LocalizationMatchedSourceText"></string>
+						<int name="MaxVisibleGraphemes">-1</int>
+						<string name="Name">Message</string>
+						<Ref name="NextSelectionDown">null</Ref>
+						<Ref name="NextSelectionLeft">null</Ref>
+						<Ref name="NextSelectionRight">null</Ref>
+						<Ref name="NextSelectionUp">null</Ref>
+						<string name="OpenTypeFeatures"></string>
+						<UDim2 name="Position">
+							<XS>0</XS>
+							<XO>0</XO>
+							<YS>0</YS>
+							<YO>0</YO>
+						</UDim2>
+						<bool name="RichText">true</bool>
+						<Ref name="RootLocalizationTable">null</Ref>
+						<float name="Rotation">0</float>
+						<bool name="Selectable">false</bool>
+						<token name="SelectionBehaviorDown">0</token>
+						<token name="SelectionBehaviorLeft">0</token>
+						<token name="SelectionBehaviorRight">0</token>
+						<token name="SelectionBehaviorUp">0</token>
+						<bool name="SelectionGroup">false</bool>
+						<Ref name="SelectionImageObject">null</Ref>
+						<int name="SelectionOrder">0</int>
+						<UDim2 name="Size">
+							<XS>1</XS>
+							<XO>0</XO>
+							<YS>1</YS>
+							<YO>0</YO>
+						</UDim2>
+						<token name="SizeConstraint">0</token>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<string name="Text"><![CDATA[Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, magna non egestas feugiat, leo ante gravida libero, nec tincidunt turpis leo ac erat. Maecenas sit amet condimentum metus. Aliquam sed pellentesque arcu. Curabitur in mauris interdum, bibendum elit et, interdum nibh. Ut consectetur sodales dolor, eu posuere ante posuere non. Pellentesque sed leo ut dui pulvinar placerat. Vivamus feugiat massa vitae est viverra tristique. Nunc porta tempus mauris, maximus consequat urna malesuada et. Proin porta, tellus eu feugiat tristique, mauris diam rutrum magna, quis lobortis tortor dui eleifend ante. Praesent porta augue turpis, nec ullamcorper mauris ultricies non. Suspendisse potenti. Cras eget consequat orci, quis egestas quam. Quisque egestas risus elementum ullamcorper pulvinar. Duis viverra ornare sem nec porttitor.
+
+Nam scelerisque enim pulvinar, eleifend neque et, bibendum nisl. Ut imperdiet vitae magna at finibus. Integer ullamcorper urna ac eros fringilla, vel sodales nulla fermentum. Integer fringilla, sapien non sagittis vestibulum, lectus est vehicula justo, sit amet venenatis urna odio ut metus. Morbi vulputate ipsum eu dapibus laoreet. Donec vitae nisl at felis ullamcorper aliquam. Vestibulum vel lectus non turpis accumsan feugiat sed pretium nibh.]]></string>
+						<Color3 name="TextColor3">
+							<R>1</R>
+							<G>1</G>
+							<B>1</B>
+						</Color3>
+						<token name="TextDirection">0</token>
+						<bool name="TextScaled">false</bool>
+						<float name="TextSize">36</float>
+						<Color3 name="TextStrokeColor3">
+							<R>0</R>
+							<G>0</G>
+							<B>0</B>
+						</Color3>
+						<float name="TextStrokeTransparency">0</float>
+						<float name="TextTransparency">0.200000003</float>
+						<token name="TextTruncate">1</token>
+						<bool name="TextWrapped">true</bool>
+						<token name="TextXAlignment">0</token>
+						<token name="TextYAlignment">0</token>
+						<bool name="Visible">true</bool>
+						<int name="ZIndex">10</int>
+					</Properties>
+				</Item>
+				<Item class="LocalScript" referent="RBX7605CFF1233943E4908E9B4277870BD5">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+						<bool name="DefinesCapabilities">false</bool>
+						<bool name="Disabled">false</bool>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">VNScript</string>
+						<token name="RunContext">0</token>
+						<string name="ScriptGuid">{E9F49C11-815F-4510-ADE3-AE8F55D431CC}</string>
+						<ProtectedString name="Source"><![CDATA[local TweenService = game:GetService("TweenService")
+
+local msg = script.Parent.Message
+local textSpeed = msg:GetAttribute("textSpeed") or 0.05
+local shortPause = textSpeed * 3
+local longPause = textSpeed * 6
+
+-- Lookup Table for wait times
+local waitTimes = {
+	["\n"] = longPause * 2,
+	["."] = longPause,
+	["?"] = longPause,
+	["!"] = longPause,
+	[":"] = longPause * 2 / 3,
+	[","] = shortPause,
+	[";"] = shortPause,
+	["—"] = longPause,
+	["–"] = longPause * 2 / 3,
+	["-"] = longPause / 3,
+}
+
+local activeTweens = {}
+
+-- Function to create and play tween
+local function createTween(instance, property, targetValue, tweenInfo)
+	local tween = TweenService:Create(instance, tweenInfo, {[property] = targetValue})
+	activeTweens[instance] = activeTweens[instance] or {}
+	activeTweens[instance][property] = tween
+	tween:Play()
+	return tween  -- Return the tween for further actions if needed
+end
+
+-- Function to handle typewriter effect via tween
+local function typeWriterTween()
+	local text = msg.ContentText
+	local textLength = utf8.len(text)
+	local waitTotal = 0
+	local startChar = 1
+
+	for i = 1, textLength do		
+		local currentChar = text:sub(i, i)
+		print(currentChar)
+
+		if waitTimes[currentChar] then
+			if i > startChar then
+				local tweenInfo = TweenInfo.new(waitTotal, Enum.EasingStyle.Linear)
+				createTween(msg, "MaxVisibleGraphemes", i - 1, tweenInfo)
+				task.wait(waitTotal)
+			end
+
+			msg.MaxVisibleGraphemes = i
+			task.wait(waitTimes[currentChar])
+			startChar = i + 1
+			waitTotal = 0
+		else
+			waitTotal = waitTotal + textSpeed
+		end
+	end
+
+	if startChar <= textLength then
+		local tweenInfo = TweenInfo.new(waitTotal, Enum.EasingStyle.Linear)
+		createTween(msg, "MaxVisibleGraphemes", textLength, tweenInfo)
+	end
+
+	task.wait(2.25)
+
+	-- Fade-out text
+	local fadeTween = createTween(msg, "TextTransparency", 1, TweenInfo.new(1))
+
+	-- Wait for fade to complete before destroying the parent
+	fadeTween.Completed:Wait() 
+	script.Parent.Parent:Destroy()
+end
+
+-- Initialize
+msg.MaxVisibleGraphemes = 0
+task.wait(0.5) -- Initial wait
+
+-- Start typewriter effect
+typeWriterTween()]]></ProtectedString>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+			</Item>
+		</Item>
+	</Item>
+</roblox>

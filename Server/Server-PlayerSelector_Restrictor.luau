@@ -1,25 +1,46 @@
---!nonstrict
+--!strict
 --[[
-	Author: Sceleratis/Davey_Bones
-	Description: This plugin will restrict any player selectors (all, others, me, etc.) to a specific admin level only;
-				 This plugin can also protect admins with certain levels from being selected using player selectors
+	Author: Sceleratis/Davey_Bones and Expertcoderz
+	Description: This plugin will restrict any player selectors
+				 (all, others, me, etc.) to a specific admin level only.
+				 This plugin can also protect admins with certain
+				 levels from being selected using player selectors.
 
 	Place this ModuleScript in Adonis_Loader > Config > Plugins and name it "Server-PlayerFinder Restrictor"
 --]]
 
+--// Permissions can be specified by rank number, rank name,
+--// or even a list of rank number and/or rank names.
 type Permission = string|number|{string|number}
 
+--[[
+	RESTRICTION vs. PROTECTION:
+		Restriction:	prevent player selectors from being used by
+						everyone without RESTRICTION_OVERRIDE_PERM
+		Protection:		prevent player selectors from selecting those
+						in PROTECTION_ELIGIBLE_PERM unless used by
+						admins with PROTECTION_OVERRIDE_PERM
+
+	If someone attempts to use a restricted player selector without
+	RESTRICTION_OVERRIDE_PERM, they will get denied immediately from
+	running the command. If they use an unrestricted player selector
+	that happens to select a protected player, the command may still
+	have effect on the other selected players that are non-protected.
+]]
+
 --// Players need this permission to use the player selectors:
-local RESTRICT_TO_SPECIFIC_PERM: Permission? = 100 --// if nil, restrictions will apply to every player regardless of perms
+--// (if nil, equivalent to nobody, i.e. restrict everyone)
+--// (if 0, equivalent to everyone, i.e. disable restriction)
+local RESTRICTION_OVERRIDE_PERM: Permission? = 300
 
 --// Players with this permission can't be selected using player selectors:
-local PROTECTION_PERM: Permission? = nil --// if nil, nobody will be protected
+--// (if nil, equivalent to nobody, i.e. disable protection)
+--// (if 0, equivalent to everyone, i.e. make player selectors useless)
+local PROTECTION_ELIGIBLE_PERM: Permission? = 900
 
 --// Players with this permission may use player selectors on protected levels nonetheless:
-local PROTECTED_LEVELS_OVERRIDE_PERM: Permission? = 900 --// if nil, nobody will be allowed to override
-
---// Should unauthorized players will be shown an error when attempting to use a restricted selector or select a protected user?
-local NOTIFY_OF_DENIALS: boolean = true
+--// (if nil, nobody will be allowed to override)
+local PROTECTION_OVERRIDE_PERM: Permission? = 900
 
 --// The player selectors to restrict:
 local SELECTORS_TO_RESTRICT: {string} = {
@@ -32,7 +53,7 @@ local SELECTORS_TO_RESTRICT: {string} = {
 	"team-",
 	"group-",
 	"#number",
-	"radius-"
+	"radius-",
 }
 
 return function(Vargs)
@@ -40,11 +61,13 @@ return function(Vargs)
 	local service = Vargs.Service
 
 	local Admin = server.Admin
+	local Remote = server.Remote
 	local Functions = server.Functions
 
-	for _, ind in ipairs(SELECTORS_TO_RESTRICT) do
+	for _, ind in SELECTORS_TO_RESTRICT do
 		local finder = Functions.PlayerFinders[ind]
 		if not finder then
+			warn("Nonexistent player selector:", ind)
 			continue
 		end
 
@@ -52,43 +75,41 @@ return function(Vargs)
 		function finder.Function(msg, plr, par, players, ...)
 			local plrLevel = Admin.GetLevel(plr)
 
-			--// Restrict player from using certain player selectors
-			if not (RESTRICT_TO_SPECIFIC_PERM and Admin.CheckComLevel(plrLevel, RESTRICT_TO_SPECIFIC_PERM)) then
-				if NOTIFY_OF_DENIALS then
-					error(string.format("You are not allowed to use the player selector '%s'", ind))
-				end
+			assert(
+				RESTRICTION_OVERRIDE_PERM
+					and Admin.CheckComLevel(plrLevel, RESTRICTION_OVERRIDE_PERM),
+				`You are not allowed to use the player selector '{ind}'`
+			)
+
+			oldFunc(msg, plr, par, players, ...)
+
+			if not PROTECTION_ELIGIBLE_PERM
+				or (PROTECTION_OVERRIDE_PERM and
+					Admin.CheckComLevel(plrLevel, PROTECTION_OVERRIDE_PERM))
+			then
 				return
 			end
 
-			--// Call original function
-			oldFunc(msg, plr, par, players, ...)
-
-			--// Filter players that have now been set
-			if not (PROTECTED_LEVELS_OVERRIDE_PERM and Admin.CheckComLevel(plrLevel, PROTECTED_LEVELS_OVERRIDE_PERM)) then
-				local removedPlayerNames = table.create(#players)
-				for i, p in ipairs(players) do
-					if PROTECTION_PERM and Admin.CheckComLevel(Admin.GetLevel(p), PROTECTION_PERM) then
-						table.remove(players, i)
-						table.insert(removedPlayerNames, service.FormatPlayer(p))
-					end
-				end
-
-				local count = #removedPlayerNames
-				if NOTIFY_OF_DENIALS and count > 0 then
-					Functions.Hint(
-						string.format(
-							"%d player%s %s deselected due to protection: %s",
-							count,
-							count == 1 and "" or "s",
-							count == 1 and "was" or "were",
-							table.concat(removedPlayerNames, ", ")
-						),
-						{plr}
+			local removedPlayerNames = {}
+			for i, selectedPlayer in players do
+				if Admin.CheckComLevel(
+					Admin.GetLevel(selectedPlayer), PROTECTION_ELIGIBLE_PERM
 					)
+				then
+					table.remove(players, i)
+					table.insert(removedPlayerNames, service.FormatPlayer(selectedPlayer))
 				end
 			end
 
-			return players
+			local count = #removedPlayerNames
+			if count > 0 then
+				Functions.Hint(
+					`{count} player(s) were deselected due to protection: {table.concat(
+						removedPlayerNames, ", "
+					)}`,
+					{plr}
+				)
+			end
 		end
 	end
 end

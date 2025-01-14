@@ -61,7 +61,6 @@ return function(Vargs)
 	local service = Vargs.Service
 
 	local Admin = server.Admin
-	local Remote = server.Remote
 	local Functions = server.Functions
 
 	for _, ind in SELECTORS_TO_RESTRICT do

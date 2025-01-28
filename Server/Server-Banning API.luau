@@ -185,7 +185,7 @@ return function(Vargs)
 	local function GetUserIdFromRecord(check)
 		if type(check) == "table" then
 			if check.UserId then
-				return check.UserId
+				return tonumber(check.UserId)
 			end
 		elseif type(check) == "string" then
 			local cName, cId = string.match(check, "(.*):(.*)")

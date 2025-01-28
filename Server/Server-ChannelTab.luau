@@ -7,15 +7,8 @@
 return function(Vargs)
 	local server, service = Vargs.Server, Vargs.Service
 
-	local Settings = server.Settings
-	local Logs = server.Logs
 	local Remote = server.Remote
-	local Commands = server.Commands
-	local Variables = server.Variables
-	local Functions = server.Functions
 	local Admin = server.Admin
-	local HTTP = server.HTTP
-	local Core = server.Core
 	
 	local TextChatService: TextChatService = service.TextChatService
 	

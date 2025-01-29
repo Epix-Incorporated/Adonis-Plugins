@@ -44,11 +44,11 @@ return function(Vargs)
 	TextChannels.ChildAdded:Connect(function(channel)
 		if string.find(channel.Name, "RBXTeam")	~= 1 then return end
 		
-		repeat
-			task.wait()
-		until #channel:GetChildren() == 0
-		
-		channel:Destroy()
+		channel.ChildRemoved:Connect(function()
+			if #channel:GetChildren() == 0 then
+				channel:Destroy()
+			end
+		end)
 	end)
 	
 	service.HookEvent("PlayerAdded", function(plr: Player)

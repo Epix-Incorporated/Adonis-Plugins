@@ -46,10 +46,6 @@ return function(Vargs)
 		
 		repeat
 			task.wait()
-		until #channel:GetChildren() ~= 0
-		
-		repeat
-			task.wait()
 		until #channel:GetChildren() == 0
 		
 		channel:Destroy()

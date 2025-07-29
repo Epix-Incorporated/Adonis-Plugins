@@ -1,9 +1,10 @@
 --[[
 	Author: WalkerOfBacon
-	Name: Channel Tabs
-	Description: This plugin will add an "Admins" channel tab and automatically remove unused team channel tabs.
+	Name: Auto Channel Tabs
+	Description: This plugin will automatically add an "Admins" channel tab and remove unused team channel tabs.
 	Place in a ModuleScript under Adonis_Loader > Config > Plugins and named "Server-ChannelTab"
 --]]
+
 return function(Vargs)
 	local server, service = Vargs.Server, Vargs.Service
 
@@ -24,18 +25,7 @@ return function(Vargs)
 	
 	local TextChannels = TextChatService and TextChatService:FindFirstChild("TextChannels")
 	
-	-- Workaround for tabs not disappearing once removed from it
-	local function refreshChatWindow(plr: Player)
-		Remote.LoadCode(plr, [[
-		local TextChannels = game.TextChatService.TextChannels
-		
-		TextChannels.Parent = nil
-		task.wait()
-		TextChannels.Parent = game.TextChatService
-		]])
-	end
-	
-	local adminChannel = service.New("TextChannel", {
+	local adminChannel: TextChannel = service.New("TextChannel", {
 		Name = "Admins";
 		Parent = TextChannels
 	})
@@ -69,7 +59,6 @@ return function(Vargs)
 			
 			
 			if not plr.Team then
-				refreshChatWindow(plr)
 				teamName = nil
 			end
 		end)
@@ -88,7 +77,6 @@ return function(Vargs)
 		local plr = channel:FindFirstChild(p.Name)
 		if channel and plr then
 			plr:Destroy()
-			refreshChatWindow(p)
 		end
 	end
 end

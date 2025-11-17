@@ -2,6 +2,8 @@ return function(Vargs)
 	local server, service = Vargs.Server, Vargs.Service
 	local Remote, Logs = server.Remote, server.Logs
 
+	server.Variables.VoteKickActive = false
+
 	server.Commands.VoteKick = {
 		Prefix = server.Settings.Prefix;
 		Commands = {"votekick"};
@@ -12,6 +14,7 @@ return function(Vargs)
 		AdminLevel = "Players";
 		Function = function(plr,args)
 			assert(args[1], "You need to specifiy a player to vote kick")
+			assert(not server.Variables.VoteKickActive, "There already is a vote kick active!")
 			
 			if #server.Functions.GetPlayers(plr, args[1], {NoFakePlayer = true})  > 1 then
 				assert(false, "You cannot vote more than one player at a time")
@@ -32,6 +35,7 @@ return function(Vargs)
 			end
 			
 			task.spawn(function()
+				server.Variables.VoteKickActive = true
 				task.wait(30)
 				
 				local Yes = 0
@@ -45,6 +49,7 @@ return function(Vargs)
 					end
 				end
 				
+				server.Variables.VoteKickActive = false
 				local Player = server.Functions.GetPlayers(plr, args[1])[1]
 				
 				if Yes > No then

@@ -9,6 +9,7 @@
 	Author: WalkerOfBacon
 	Name: Chat Tags
 	Description: This plugin will automatically create chat tags
+	DISCLAIMER: DO NOT take the ChatColor script and move it to StarterPlayerScripts. This plugin will clone the script and move it to PlayerScripts.
 	Place in a ModuleScript under Adonis_Loader > Config > Plugins and named "Server-CustomChatTags"
 --]]
 

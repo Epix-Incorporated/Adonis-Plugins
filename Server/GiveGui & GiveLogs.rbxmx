@@ -424,7 +424,7 @@ end
 
 if localplayer:IsInGroup(group) then
 	for _, v in pairs(ranks) do
-		if localplayer:GetRankInGroup(group) == v then
+		if localplayer:GetRankInGroupAsync(group) == v then
 			allowed = true
 			break
 		end

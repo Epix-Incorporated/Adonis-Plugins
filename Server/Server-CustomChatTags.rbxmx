@@ -299,7 +299,7 @@ TextChatService.OnChatWindowAdded = function(msg: TextChatMessage)
 				if RankID and GroupID ~= nil then
 					local plr = Players:GetPlayerByUserId(textSource.UserId)
 
-					if plr:IsInGroup(GroupID) and plr:GetRankInGroup(GroupID) == RankID then
+					if plr:IsInGroup(GroupID) and plr:GetRankInGroupAsync(GroupID) == RankID then
 						properties.PrefixText = `[{v.Name}]`
 						properties.Text = string.format(`<font color='{NameColor}'>%s</font>`, msg.PrefixText) .. " " .. msg.Text
 						properties.PrefixTextProperties = chatWindowConfiguration:DeriveNewMessageProperties()

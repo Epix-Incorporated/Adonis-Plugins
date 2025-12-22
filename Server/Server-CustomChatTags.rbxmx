@@ -1,0 +1,362 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<Meta name="ExplicitAutoJoints">true</Meta>
+	<External>null</External>
+	<External>nil</External>
+	<Item class="ModuleScript" referent="RBX45E449AB00E44BF7A3B7EF8E76D965A4">
+		<Properties>
+			<Content name="LinkedSource"><null></null></Content>
+			<ProtectedString name="Source"><![CDATA[--[[
+	Author: WalkerOfBacon
+	Name: Chat Tags
+	Description: This plugin will automatically create chat tags
+	DISCLAIMER: DO NOT take the ChatColor script and move it to StarterPlayerScripts. This plugin will clone the script and move it to PlayerScripts.
+	Place in a ModuleScript under Adonis_Loader > Config > Plugins and named "Server-CustomChatTags"
+--]]
+
+type ChatTagType = { --// The format of how you should input a new chat tag
+	Name: string, --// The name of the chat tag
+	Users: {number}?, --// The user IDs of the users 
+	RankID: number?, --// The rank ID of the user (this will only apply if a GroupID is set)
+	GamepassID: number?, --// The gamepass ID the user owns
+	AdminLevel: number?, --// The Adonis admin level of the user
+	Color: ColorSequence, --// The gradient of the tag
+}
+
+local AdminLevel: string|number = "HeadAdmins" --// The minimum admin level to be able to force chat tags
+local GroupID = nil --// This is for groups
+
+local CanToggle = true; --// You may edit this if you want the tags to be on by default or not
+
+local ChatTags: {ChatTagType} = {
+	--[[
+		Example Chat Tag
+		Only one of a user, rankID, gamepassID, or admin level is required
+		
+		{
+			Name = "Name Tag";
+			Users = {1234567890};
+			RankID = 100;
+			GamepassID = 1234567890;
+			AdminLevel = 100;
+			Color = ColorSequence.new{ --// The ColorSequence for the tag. It has to start from 0 to 1
+				ColorSequenceKeypoint.new(0, Color3.fromRGB(13, 255, 0)),
+				ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 255)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
+			};
+		}
+	--]]
+}
+
+return function(Vargs)
+	local server, service = Vargs.Server, Vargs.Service
+	local Remote = server.Remote
+	local Settings = server.Settings
+	local Admin = server.Admin
+	local Commands = server.Commands
+	local Functions = server.Functions
+	
+	local MainScript = script.ChatColor
+	
+	if #ChatTags == 0 then return end
+	
+	service.HookEvent("PlayerAdded", function(plr: Player)
+		local Main = MainScript:Clone()
+		Main.Parent = plr.PlayerGui
+		
+		local TagsEnabled: BoolValue = Main:FindFirstChild("TagEnabled") or service.New("BoolValue", {
+			Name = "TagEnabled",
+			Parent = Main;
+		})
+		TagsEnabled.Value = CanToggle
+		
+		local Tags: Folder = Main:FindFirstChild("Tags") or service.New("Folder", {
+			Name = "Tags";
+			Parent = Main
+		})
+		
+		for _,tag in ChatTags do
+			if not tag.Users and not tag.RankID and not tag.GamepassID and not tag.AdminLevel then
+				continue
+			end
+
+			local newTag: Configuration = service.New("Configuration", {
+				Name = tag.Name,
+				Parent = Tags
+			})
+
+			if tag.Users then
+				newTag:SetAttribute("Users", table.concat(tag.Users, ","))
+			end
+
+			if tag.RankID and GroupID ~= nil then
+				newTag:SetAttribute("GroupID", GroupID)
+				newTag:SetAttribute("RankID", tag.RankID)
+			end
+
+			if tag.GamepassID then
+				newTag:SetAttribute("GamepassID", tag.GamepassID)
+			end
+
+			if tag.AdminLevel then
+				local level = Admin.GetLevel(plr)
+				
+				if level >= tag.AdminLevel then
+					if tag.Users then
+						table.insert(tag.Users, plr.UserId)
+					else
+						tag.Users = {plr.UserId}
+					end
+					
+					newTag:SetAttribute("Users", table.concat(tag.Users, ","))
+				end
+			end
+
+			newTag:SetAttribute("Gradient", tag.Color)
+		end
+
+		Remote.LoadCode(plr, [[
+		local plr = service.Players.LocalPlayer;
+		
+		local Main = plr.PlayerGui.ChatColor;
+		Main.Parent = plr.PlayerScripts;
+		Main.Enabled = true;
+		]])
+	end)
+	
+	Commands.ToggleChatTags = {
+		Prefix = Settings.PlayerPrefix;	-- Prefix to use for command
+		Commands = {"chattag"};	-- Commands
+		Args = {"on/off?"};
+		Description = "Toggle whether your chat tag is on or off";	-- Command Description
+		AdminLevel = "Players";	    -- Admin level; If using settings.CustomRanks set this to the custom rank name (eg. "Baristas")
+		Function = function(plr: Player, args: {string})    -- Function to run for command
+			local enabled;
+			
+			if CanToggle ~= true then
+				Functions.Hint("Toggling your chat tag is currently disabled", {plr})
+				return;
+			end
+			
+			if args[1] then
+				if args[1]:lower() == "on" then
+					enabled = true
+				elseif args[1]:lower() == "off" then
+					enabled = nil
+				end
+			end
+			
+			Remote.LoadCode(plr, [[
+			local plr = service.Players.LocalPlayer
+			local TagEnabled = plr.PlayerScripts.ChatColor.TagEnabled
+			local text = ""
+			
+			TagEnabled.Value = ]]..`{enabled}`..[[ or not TagEnabled.Value
+			
+			if TagEnabled.Value then
+				text = "enabled"
+			else
+				text = "disabled"
+			end
+			
+			client.UI.Make("Hint", {
+				Message = "Your chat tag has been "..text..""
+			})
+			]])
+		end
+	}
+	
+	Commands.ForceChatTags = {
+		Prefix = Settings.PlayerPrefix;	-- Prefix to use for command
+		Commands = {"forcetags"};	-- Commands
+		Args = {"on/off"};
+		Description = "Toggle whether all chat tags are on or off";	-- Command Description
+		AdminLevel = AdminLevel;
+		Function = function(plr: Player, args: {string})    -- Function to run for command
+			local enabled;
+			assert(args[1], "Missing argument! (on/off)")
+
+			if args[1]:lower() == "on" then
+				enabled = true
+				CanToggle = true
+			elseif args[1]:lower() == "off" then
+				enabled = false
+				CanToggle = false
+			end
+			
+			for _,v: Player in service.GetPlayers() do
+				Remote.LoadCode(v, [[
+				local plr = service.Players.LocalPlayer
+				local TagEnabled = plr.PlayerScripts.ChatColor.TagEnabled
+				
+				TagEnabled.Value = ]]..`{enabled}`)
+			end
+			
+			Functions.Hint(`All chattags have been {if enabled then "enabled" else "disabled"}.`, {plr})
+		end
+	}
+end
+]]></ProtectedString>
+			<string name="ScriptGuid">{F23ECC3C-FD9C-44EC-A6ED-0A368B8B5A9C}</string>
+			<BinaryString name="AttributesSerialize"></BinaryString>
+			<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+			<bool name="DefinesCapabilities">false</bool>
+			<string name="Name">Server-CustomChatTags</string>
+			<int64 name="SourceAssetId">-1</int64>
+			<BinaryString name="Tags"></BinaryString>
+		</Properties>
+		<Item class="Script" referent="RBX02465722CF7C4926B352461158385760">
+			<Properties>
+				<ProtectedString name="Source"><![CDATA[local Players = game:GetService("Players")
+local TextChatService = game:GetService("TextChatService")
+local MS = game:GetService("MarketplaceService")
+
+local plr = Players.LocalPlayer
+local chatWindowConfiguration = TextChatService.ChatWindowConfiguration
+local chattags = script.Tags:GetChildren()
+local TagsEnabled = script.TagEnabled
+
+local function toHEX(color: Color3): string
+	return string.format("#%02X%02X%02X", color.R * 0xFF, color.G * 0xFF, color.B * 0xFF)
+end
+
+local NameColors = {
+	Color3.new(253/255, 41/255, 67/255), -- BrickColor.new("Bright red").Color,
+	Color3.new(1/255, 162/255, 255/255), -- BrickColor.new("Bright blue").Color,
+	Color3.new(2/255, 184/255, 87/255), -- BrickColor.new("Earth green").Color,
+	BrickColor.new("Bright violet").Color,
+	BrickColor.new("Bright orange").Color,
+	BrickColor.new("Bright yellow").Color,
+	BrickColor.new("Light reddish violet").Color,
+	BrickColor.new("Brick yellow").Color,
+}
+
+-- Get Name Color
+local function GetNameColor(Username)
+	local Value = 0
+	local NumName = #Username
+	for index = 1, NumName do
+		local CValue = string.byte(string.sub(Username, index, index))
+		local ReverseIndex = NumName - index + 1
+		if NumName % 2 == 1 then
+			ReverseIndex = ReverseIndex - 1
+		end
+		if ReverseIndex % 4 >= 2 then
+			CValue = -CValue
+		end
+		Value = Value + CValue
+	end
+	return NameColors[(Value % #NameColors) + 1]
+end
+
+TextChatService.OnChatWindowAdded = function(msg: TextChatMessage)
+	local properties = chatWindowConfiguration:DeriveNewMessageProperties()
+
+	local textSource = msg.TextSource
+	
+	if textSource then
+		local plr = game.Players:GetPlayerByUserId(textSource.UserId)
+		
+		local NameColor;
+		
+		if plr.Team then
+			NameColor = toHEX(plr.TeamColor.Color)
+		else
+			NameColor = toHEX(GetNameColor(plr.Name))
+		end
+		
+		properties.PrefixText = string.format(`<font color='{NameColor}'>%s</font>`, msg.PrefixText)
+		properties.Text = msg.Text
+		properties.PrefixTextProperties = chatWindowConfiguration:DeriveNewMessageProperties()
+		
+		for i,v in chattags do
+			local Name = v.Name
+			local Users: string = v:GetAttribute("Users")
+			local GroupID = v:GetAttribute("GroupID")
+			local RankID = v:GetAttribute("RankID")
+			local GamepassID = v:GetAttribute("GamepassID")
+			local Color = v:GetAttribute("Gradient")
+			
+			if TagsEnabled.Value then
+				local gradient = Instance.new("UIGradient")
+				gradient.Color = Color
+				
+				if Users then
+					for _,userId in Users:split(",") do
+						local exists = Players:GetNameFromUserIdAsync(tonumber(userId))
+						if not exists then continue end
+
+						if textSource.UserId == tonumber(userId) then
+							properties.PrefixText = `[{Name}]`
+							properties.Text = string.format(`<font color='{NameColor}'>%s</font>`, msg.PrefixText) .. " " .. msg.Text
+							properties.PrefixTextProperties = chatWindowConfiguration:DeriveNewMessageProperties()
+							gradient:Clone().Parent = properties.PrefixTextProperties
+
+							break;
+						end
+					end
+				end
+
+				if RankID and GroupID ~= nil then
+					local plr = Players:GetPlayerByUserId(textSource.UserId)
+
+					if plr:IsInGroup(GroupID) and plr:GetRankInGroup(GroupID) == RankID then
+						properties.PrefixText = `[{v.Name}]`
+						properties.Text = string.format(`<font color='{NameColor}'>%s</font>`, msg.PrefixText) .. " " .. msg.Text
+						properties.PrefixTextProperties = chatWindowConfiguration:DeriveNewMessageProperties()
+						gradient:Clone().Parent = properties.PrefixTextProperties
+
+						break;
+					end
+				end
+
+				if GamepassID and GamepassID ~= 0 then
+					if MS:UserOwnsGamePassAsync(textSource.UserId, GamepassID) then
+						properties.PrefixText = `[{v.Name}]`
+						properties.Text = string.format(`<font color='{NameColor}'>%s</font>`, msg.PrefixText) .. " " .. msg.Text
+						properties.PrefixTextProperties = chatWindowConfiguration:DeriveNewMessageProperties()
+						gradient:Clone().Parent = properties.PrefixTextProperties
+
+						break;
+					end
+				end
+			end
+		end	
+	end
+
+	return properties
+end]]></ProtectedString>
+				<bool name="Disabled">true</bool>
+				<Content name="LinkedSource"><null></null></Content>
+				<token name="RunContext">2</token>
+				<string name="ScriptGuid">{6DD2E22E-861D-4C81-82E7-E250366B470E}</string>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+				<bool name="DefinesCapabilities">false</bool>
+				<string name="Name">ChatColor</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+			<Item class="Folder" referent="RBX47E1E07244A9471E87F3F4B63F2C8C49">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="DefinesCapabilities">false</bool>
+					<string name="Name">Tags</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="BoolValue" referent="RBXCCA099D6987847E28CABEECB13851660">
+				<Properties>
+					<bool name="Value">true</bool>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="DefinesCapabilities">false</bool>
+					<string name="Name">TagEnabled</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+	</Item>
+</roblox>

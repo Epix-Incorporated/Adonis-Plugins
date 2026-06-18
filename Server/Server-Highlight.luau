@@ -27,6 +27,7 @@ return function(Vargs)
 					local existing = character:FindFirstChild("FAS_Highlight")
 					if existing then
 						existing:Destroy()
+						return
 					end
 
 					local highlight = Instance.new("Highlight")
